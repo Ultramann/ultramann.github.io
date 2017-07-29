@@ -84,13 +84,12 @@ main = hakyllWith siteConf $ do
   match "templates/*" $ compile templateBodyCompiler
 
 siteConf :: Configuration
-siteConf = defaultConfiguration { 
-             destinationDirectory = "generated/site"
-           , storeDirectory       = "generated/cache"
-           , tmpDirectory         = "generated/cache/tmp"
-           , providerDirectory    = "content"
-           , previewHost          = "0.0.0.0"
-           }
+siteConf = defaultConfiguration { deployCommand        = "bash src/deploy.sh"
+                                , destinationDirectory = "generated/site"
+                                , storeDirectory       = "generated/cache"
+                                , tmpDirectory         = "generated/cache/tmp"
+                                , providerDirectory    = "content"
+                                , previewHost          = "0.0.0.0" }
 
 postCtx :: Context String
 postCtx = dateField "date" "%B %e, %Y" <> defaultContext
