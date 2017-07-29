@@ -19,5 +19,6 @@ Hi, I'm Cary Goltermann. I have a degree in Mathematics and Physics. Currently a
 You can reach me in the following ways, organized in descending order of how frequently I check the mode:
 
 * email: [cary.goltermann@gmail.com](mailto:cary.goltermann@gmail.com)
+* linkedin: [/carygoltermann](https://www.linkedin.com/in/carygoltermann/)
 * github: [\@ultramann](www.github.com/ultramann)
 * twitter: [\@carygoltermann](www.twitter.com/CaryGoltermann?lang=en)
