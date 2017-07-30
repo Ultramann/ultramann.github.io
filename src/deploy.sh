@@ -1,5 +1,6 @@
 #!/urs/bin/env bash
 
+REMOTE="https://github.com/Ultramann/ultramann.github.io.git"
 SITE="generated/site"
 DEPLOY="deploy"
 
@@ -22,7 +23,11 @@ failed() {
 }
 
 alert "Removed old site files..."
-rm -rf "$DEPLOY"/* || failed
+if [ ! -d $DEPLOY ]; then
+  update "no deploy folder. Cloning..."
+  git clone "$REMOTE" deploy &> /dev/null || failed
+fi
+rm -rf "$DEPLOY"/*
 successful
 
 alert "Building site..."
@@ -33,7 +38,7 @@ alert "Copying files for deploying..."
 cp -r "$SITE"/* $DEPLOY &> /dev/null || failed
 successful
 
-MESS=$(git log -1 HEAD --pretty=format:%s)
+MESSAGE=$(git log -1 HEAD --pretty=format:%s)
 HASH=$(git log -1 HEAD --pretty=format:%h)
 
 cd $DEPLOY
@@ -42,7 +47,7 @@ alert "Adding files to git..."
 git add --all . || failed
 
 update "committing..."
-git commit -m "$MESS, generated from $HASH" &> /dev/null || failed
+git commit -m "$MESSAGE, generated from $HASH" &> /dev/null || failed
 successful
 
 alert "Deploying..."
