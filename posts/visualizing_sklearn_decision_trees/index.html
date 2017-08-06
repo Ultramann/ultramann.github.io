@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Visualizing scikit-learn Decision Trees</title>
+        <link rel="stylesheet" href="../../css/default.css" />
+        <link rel="stylesheet" href="../../css/syntax.css" />
+    </head>
+    <body>
+        <header>
+            <div class="logo">
+                <a href="../../"><img alt="mlml" src="../../images/base/mlml.png" width="12%"></a>
+            </div>
+            <nav>
+                <a href="../../">Home</a>
+                <a href="../../about/">About</a>
+                <a href="../../notes/">Notes</a>
+                <a href="../../posts/">Posts</a>
+            </nav>
+        </header>
+
+        <main role="main">
+            <h1 class="title">Visualizing scikit-learn Decision Trees</h1>
+            <article>
+    <section class="header">
+        <i>Posted on August  5, 2017</i>
+    </section>
+    <section>
+        <p>Decision trees aren’t an insanely difficult concept to grasp. But this doesn’t mean a good visualization of a trained decision tree can’t help develop a deeper understanding of the model.</p>
+<p>In this post we’ll take a look at small piece of code I wrote to draw the split lines that result from a scikit-learn decision tree being built and discuss the process I went through to write it. All the code used for the visualizations in this post can be found <a href="decision_tree_viz.py">here</a>. <em><strong>&lt;–UPDATE LINK FOR PRODUCTION</strong></em>.</p>
+<!--more-->
+<h1 id="design-decisions">Design Decisions</h1>
+<p>When I was first thinking about writing code to visualize decision tree splits I considered writing my own decision tree class which <em>may</em> have been easier than tearing into scikit-learn’s decision trees which end up being implemented in Cython.</p>
+<p>However, after thinking about what I’d like from the code at a larger scale I realized it would be better to write something for scikit-learn’s decision trees as they are the basis of all scikit-learn’s tree ensemble models. Aka, I would be able to visualize the trees in a random forest or gradient boosted tree ensemble easily if I had something that worked on a single decision tree. Thanks, scikit-learn, for writing well composed code!</p>
+<h1 id="starting-point">Starting Point</h1>
+<p>One thing that’s actually pretty easy to do with classification models is plot their decision regions; note, I’ll only be working with classifiers because of this quality. Let’s take a look at what you get with some sample data, and roughly the strategy used in a scikit-learn tutorial found <a href="http://scikit-learn.org/stable/auto_examples/tree/plot_iris.html">here</a>. The function, <code>plot_decision_regions</code>, for plotting the decision regions can be found in the source linked above.</p>
+<div class="mpl" style="text-align: center">
+<img src="../../images/decision_tree_viz/dt_decision_regions.png" style="width: 450px">
+</div>
+<p>If you don’t understand what’s going on in that tutorial/my function, or are too lazy to read the code then let me summarize for you. It’s creating a grid of points (using <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.meshgrid.html"><code>np.meshgrid</code></a>), lots of points, and running each of those points through the fitted decision tree to get a prediction. Then all of those predictions are plotted (using <a href="https://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.contourf"><code>plt.contourf</code></a>) creating the illusion that a complete decision regions are known.</p>
+<p>Note that we really can’t do a great job plotting decision boundaries in greater than two dimensions. So the rest of this post will assume that our data only has two dimensions.</p>
+<p>From the decision regions above you could pretty easily infer the splits that were made in the decision tree. I mean, there were only three splits. But consider what happens when the data and therefore the decision tree gets bigger.</p>
+<div class="mpl" style="text-align: center">
+<img src="../../images/decision_tree_viz/big_dt_decision_regions.png" style="width: 450px">
+</div>
+<p>To be quite honest, it’d be fair to say that having the explicit split lines plotted on the image above wouldn’t really make it “easier” to understand what splits were made, much less why. But, I definitely don’t think they hurt. Either way, you’ll be able to decide for yourself soon.</p>
+<h1 id="decision-trees-in-scikit-learn">Decision Trees in scikit-learn</h1>
+<p>You can find the documentation for scikit-learn’s <code>DecisionTreeClassifier</code> <a href="http://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html">here</a>. The documentation describes the parameters that can be set before training the tree. Nothing about splits in sight…</p>
+<p>Looking further, we find reference to:</p>
+<pre><code>tree_: Tree object
+      The underlying Tree object.</code></pre>
+<p>It seems that if information about splits is going to be anywhere it’ll be here. Unfortunately this is about where our friend, the documentation, stops being useful. Off to the source!</p>
+<h2 id="the-source-code">The Source Code</h2>
+<p>Looking at the <a href="https://github.com/scikit-learn/scikit-learn/blob/ab93d65/sklearn/tree/tree.py#L698"><code>.fit</code></a> method we see a good doc string, and then, lo and behold!</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="bu">super</span>(DecisionTreeClassifier, <span class="va">self</span>).fit(...)</code></pre></div>
+<p>Nerts.</p>
+<p>This makes a lot of sense since basically the same logic can be used to train a <a href="https://github.com/scikit-learn/scikit-learn/blob/ab93d65/sklearn/tree/tree.py#L819">regression tree</a>, so abstracting out as much similar behavior as possible is certainly a good idea.</p>
+<p>Alright, <a href="https://github.com/scikit-learn/scikit-learn/blob/ab93d65/sklearn/tree/tree.py#L508">looks like</a> we need to go look at the <code>BaseDecisionTree</code>. Its <a href="https://github.com/scikit-learn/scikit-learn/blob/ab93d65/sklearn/tree/tree.py#L698"><code>.fit</code></a> method looks waaay more promising. Perusing through this method is like adventuring through a jungle of logic checking the validity of the different parameters that can be passed to govern training. And <a href="https://github.com/scikit-learn/scikit-learn/blob/ab93d65/sklearn/tree/tree.py#L334">then</a>!</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="va">self</span>.tree_ <span class="op">=</span> Tree(<span class="va">self</span>.n_features_, <span class="va">self</span>.n_classes_, <span class="va">self</span>.n_outputs_)</code></pre></div>
+<p>Less nerts!</p>
+<p>Where do we find <code>Tree</code>? Well, if this code is worth its salt I can say two things without looking at a single line of code, it’s either defined in this <code>tree.py</code> script or it’s getting imported at the top, and it’s a class. Taking advantage of this knowledge involves a quick search for “Tree” for a global definition. And there on <a href="https://github.com/scikit-learn/scikit-learn/blob/ab93d65/sklearn/tree/tree.py#L43">line 43</a>.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">from</span> ._tree <span class="im">import</span> Tree</code></pre></div>
+<p>If you aren’t familiar with relative imports, this is just saying that <code>Tree</code> is getting imported from the <code>_tree</code> script in this directory.</p>
+<h3 id="source-code-exploration-pointers">Source Code Exploration Pointers</h3>
+<p>Side note, if you’ve been trying to follow along with the winding path through the source code up until this point there’s a chance you’ve been staying in the browser scrolling up and down in a browser window in github. This might work on a small scale. But quickly it’s a pain to keep track of where you are and even moving within a larger file can be arduous. To this end, I generally suggest that source code exploration be done in your text editor of choice.</p>
+<p>There’s a decent chance that you’ll have retrieved scikit-learn via pip or conda, in which case you probably don’t know where the <strong>actual</strong> location of the source files. If this is the case I have a gem for you!</p>
+<p>You can find the actual file that a library is being imported from as it’s defined as a dunder attribute on the reference when imported. Aka, if you import a library, say, <code>sklearn</code> you can find out where it’s file is by accessing it’s <code>__file__</code> attribute.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> sklearn
+<span class="op">&gt;&gt;&gt;</span> sklearn.<span class="va">__file__</span>
+<span class="co">'/Users/Ultramann/anaconda3/lib/python3.5/site-packages/sklearn/__init__.py'</span></code></pre></div>
+<h3 id="cython-time">Cython Time</h3>
+<p>For the record, the advice I espoused in the section above stops being useful here because the <code>_tree</code> script is actually some Cython, and on your system it’s going to be compiled. So we’re basically relegated to looking through the source in github. :-/</p>
+<p>Probably the most valuable thing one could do at this point is read the doc string for the <a href="https://github.com/scikit-learn/scikit-learn/blob/ab93d657eb4268ac20c4db01c48065b5a1bfe80d/sklearn/tree/_tree.pyx#L490"><code>Tree</code></a> class found in Cython source file <a href="https://github.com/scikit-learn/scikit-learn/blob/ab93d657eb4268ac20c4db01c48065b5a1bfe80d/sklearn/tree/_tree.pyx"><code>_tree.pyx</code></a>. This is <strong>not</strong> what I did the first time through and found myself confusedly reading a bunch of well thought out Cython; read: lots of separation of concerns; read: lots of misdirection. I eventually found what I was looking for in some stackoverflow answer and when I went back to look at the source I found the same, but more thorough, answer in the doc string.</p>
+<p>Now lots of the previously confusing code made way more sense and I realized that I was confused because I was expecting some recursive process to build the tree as I was taught decision trees are built recursively. But now I saw that the recursive building process was being emulated by a stack of regions to work on. And so the “recursion” was being governed by a while loop, instead of explicit recursion, that constantly pops off the next region to decide a split in. When it does split it records the split information and pushes the two sub-regions the split created onto the stack. This makes sense as the code is written in Cython and not a functional language. Also made the comment in the source, “Recursive partition (without actual recursion)”, make a lot more sense. It’s good to know these details because understanding them will make the process of finding split lines way easier.</p>
+<p>The key attributes of the <code>Tree</code> class that are going to be necessary to understand are: <code>children_left</code>, <code>children_right</code>, <code>feature</code> and <code>threshold</code>. All of these are arrays with length number of nodes in the tree, including leaves. They are all governed by the concept of a node id. Given a node id you can use it to index into any of these arrays and get back the node id of its right child, the node id of its left child, the feature (by index) that was used to split on in that node, and the threshold for that split, respectively.</p>
+<p>Armed with this knowledge we can return the more familiar world of Python to figure out a way to draw the split lines.</p>
+<h1 id="drawing-the-split-lines">Drawing the Split Lines</h1>
+<p>One of the first things that I was thinking prior to all this digging into scikit-learn source was that I’d be writing the code to tear apart the tree recursively. In line with the discussion of the tree build process above, this doesn’t directly match with either the most pythonic approach to the problem, nor iterative process used to build the tree. On this note I’m punting since recursion, while not particularly pythonic, is cool and definitely faster for my brain and fingers to code up. The only potential downfall to choosing the recursion path is that Python enforces a default recursion depth limit of somewhere around 1000. So I could potentially run into that if I tried to recursively break down a scikit-learn tree that is <strong>HUGE</strong>. Good to know the limitations upfront and I’m willing to accept those potential future consequences. Moving on.</p>
+<p>For a reference to aim for, this is what we’re trying to create.</p>
+<div class="mpl" style="text-align: center">
+<img src="../../images/decision_tree_viz/dt_decision_regions_splits.png" style="width: 450px">
+</div>
+<h2 id="recursively-cutting-down-the-tree">Recursively Cutting Down the Tree</h2>
+<p>At this point I know that I’m going want to a function that has a basic structure like this.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> recursive_thing(stuff, i, dont, know, yet):
+    feature, threshold <span class="op">=</span> get_node_split_info(ummm, things)
+    left, right <span class="op">=</span> get_child_nodes(more, things)
+
+    record_split_info(feature, threshold)
+
+    recursive_thing(left, child, stuff)
+    recursive_thing(right, child, stuff)</code></pre></div>
+<p>Wonderful! The code is basically writing itself! Jk.</p>
+<p>To figure out how to move from the lovely pseudocode above to a function that actually, you know, works I need to ask myself a couple of questions.</p>
+<ol style="list-style-type: decimal">
+<li>How to I get information about the split?</li>
+<li>How to record the information about the splits as I recurse?</li>
+<li>How do I use the <code>feature</code> and <code>threshold</code> information to recurse correctly?</li>
+<li>What is the base case that stops the recursion?</li>
+<li>How to kick off the recursion?</li>
+</ol>
+<h3 id="getting-split-information">Getting Split Information</h3>
+<p>As mentioned <a href="#cython-time">above</a> all of the information we need about how a split was made in a node is in the arrays <code>children_left</code>, <code>children_right</code>, <code>feature</code> and <code>threshold</code>. Each of these is indexed by the node id. This tells me two things that the function needs to get passed: the node id and each of these arrays. Getting the split information is now as simple as indexing a few times. And the code evolves.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> recursive_thing(node_id, stuff, i, dont, know, yet,
+                    features, thresholds, children_left, children_right):
+    feature, threshold <span class="op">=</span> features[node_id], thresholds[node_id]
+    left_child, right_child <span class="op">=</span> children_left[node_id], children_right[node_id]
+
+    record_split_info(feature, threshold)
+
+    recursive_thing(left_child, stuff,
+                    features, thresholds, children_left, children_right)
+    recursive_thing(right_child, stuff,
+                    features, thresholds, children_left, children_right)</code></pre></div>
+<h3 id="recording-the-split-information">Recording the Split Information</h3>
+<p>I actually punted on answering the first question for awhile and opted to pass a matplotlib Axis object through the recursive calls and directly plot the split lines on it each time one was found.</p>
+<p>It wasn’t until I showed one of my colleagues the code and he mentioned that it wouldn’t be easy to test that I reverted agreeing that I should separate the split finding from split drawing. I realized that the simple answer to the first question was to pass along a list that would append to storing all the information about the splits as the function recursed down the tree. This might not seem particularly…elegant, but it works well given the following considerations.</p>
+<p>First, Python is a call-by-object-reference, not sure if that’s an official term, language. Practically this means that it’s cheap to pass anything to a function as it’s just a reference to the object that gets passed. This can be an issue if you start to wander into concurrency-ville, but I’m not concerned with that here, so we good.</p>
+<p>Second, there’s a world in which we’d care about the order that we traverse the tree and therefore the order that split information in returned from this function. The nature of this naive recursion approach is that you only get depth first traversal out, if you wanted a breath first traversal you’d have to separate getting the split information for a level in your tree from recursing down a level. Blah, good thing I don’t care. Though I might in the future if I wanted to be able to control how deep I go drawing splits, or something even cooler like drawing the splits with thinner lines the further down the tree the split was made. Project for future me.</p>
+<p>Now my function takes a slightly more specific form.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> recursive_thing(split_info_list, node_id, stuff, i, dont, know, yet,
+                    features, thresholds, children_left, children_right):
+    feature, threshold <span class="op">=</span> features[node_id], thresholds[node_id]
+    left_child, right_child <span class="op">=</span> children_left[node_id], children_right[node_id]
+
+    split_info_list.append((feature, threshold))
+
+    recursive_thing(split_info_list, left_child, stuff,
+                    features, thresholds, children_left, children_right)
+    recursive_thing(split_info_list, right_child, stuff,
+                    features, thresholds, children_left, children_right)</code></pre></div>
+<h3 id="using-the-split-information">Using the Split Information</h3>
+<p>The main reason that I chose to write this function recursively was to get around the issue of figuring out the bounds that a split line should be drawn in as they successively restrict as the split is made further down the tree.Give this I see that the “using the split information” means figuring out the bounds for a left and right children knowing what feature a split was made on and the threshold that it occurred at. It also means passing that information at each call to the function and saving it along with the feature and threshold in <code>split_info_list</code>. At this point, to cut down on characters a bit, I renamed <code>split_info_list</code> to <code>ftbs</code>. I’m also going to give the function a better name, how about <code>get_split_lines</code>?</p>
+<p>It turns out that the <code>features</code> array actually holds three unique values even when we only work with data with two features. Those unique values are: <code>-1, 0, 1</code>. While this is a little weird, I know that indexing with <code>-1</code> will get the last element in a list/array. So <code>0</code> and <code>-1</code> are actually synonymous. This will barely affect the logic I write to figure out the bounds for the children.</p>
+<p>I decided that all of the boundary information should be contained in a nested tuple that looks like: <code>((x_min, x_max), (y_min, y_max))</code>, all floats. This way it’s easy to pass all of the boundary information in a single variable and getting to the component bounds can be done with, either, successive indexing or tuple unpacking. I end up using both.</p>
+<p>It’s easy to see now that what the function should do is get the split information, <code>feature</code> and <code>threshold</code>, and given the bounds for the node it’s concerned with determine what the bounds will be for it’s left and right children. This calculation will be slightly different depending on whether the first or second feature was used to split. But other than this consideration, the process is pretty straightforward.</p>
+<p>We’re getting really close now.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> get_split_lines(ftbs, node_id, bounds,
+                    features, thresholds, children_left, children_right):
+    x_bounds, y_bounds <span class="op">=</span> bounds
+    feature, threshold <span class="op">=</span> features[node_id], thresholds[node_id]
+    left_child, right_child <span class="op">=</span> children_left[node_id], children_right[node_id]
+
+    ftbs.append((feature, threshold, bounds))
+    <span class="cf">if</span> feature <span class="op">==</span> <span class="dv">1</span>:
+        left_bounds <span class="op">=</span> (x_bounds, (y_bounds[<span class="dv">0</span>], threshold))
+        right_bounds <span class="op">=</span> (x_bounds, (threshold, y_bounds[<span class="dv">1</span>]))
+    <span class="cf">else</span>:
+        left_bounds <span class="op">=</span> ((x_bounds[<span class="dv">0</span>], threshold), y_bounds)
+        right_bounds <span class="op">=</span> ((threshold, x_bounds[<span class="dv">1</span>]), y_bounds)
+
+    get_split_lines(ftbs, left_child, left_bounds,
+                    features, thresholds, children_left, children_right)
+    get_split_lines(ftbs, right_child, right_bounds,
+                    features, thresholds, children_left, children_right)</code></pre></div>
+<h3 id="stopping-the-recursion">Stopping the Recursion</h3>
+<p>A base case is always necessary when writing recursive code. If you ever find yourself writing something recursively make sure that you’re thinking about what the base case is that stops the recursive calls. This conditional will almost always be at the top of the function.</p>
+<p>In this function the base case occurs when we encounter a leaf node. How do we know we’re in a leaf node considering that no such information with recorded in the scikit-learn tree? After a little experimentation I realized that this information is stored implicitly in the <code>children_left</code> and <code>children_right</code> arrays. The leaf nodes are ones that reference themselves as their own “child”. In code, <code>if {left,right}_child == node_id</code>.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> get_split_lines(ftbs, node_id, bounds, leaf,
+                    features, thresholds, children_left, children_right):
+    <span class="cf">if</span> leaf: <span class="cf">return</span>
+
+    x_bounds, y_bounds <span class="op">=</span> bounds
+    feature, threshold <span class="op">=</span> features[node_id], thresholds[node_id]
+    left_child, right_child <span class="op">=</span> children_left[node_id], children_right[node_id]
+
+    ftbs.append((feature, threshold, bounds))
+    <span class="cf">if</span> feature <span class="op">==</span> <span class="dv">1</span>:
+        left_bounds <span class="op">=</span> (x_bounds, (y_bounds[<span class="dv">0</span>], threshold))
+        right_bounds <span class="op">=</span> (x_bounds, (threshold, y_bounds[<span class="dv">1</span>]))
+    <span class="cf">else</span>:
+        left_bounds <span class="op">=</span> ((x_bounds[<span class="dv">0</span>], threshold), y_bounds)
+        right_bounds <span class="op">=</span> ((threshold, x_bounds[<span class="dv">1</span>]), y_bounds)
+
+    get_split_lines(ftbs, left_child, left_bounds, left_child <span class="op">==</span> node_id,
+                    features, thresholds, children_left, children_right)
+    get_split_lines(ftbs, right_child, right_bounds, right_child <span class="op">==</span> node_id,
+                    features, thresholds, children_left, children_right)</code></pre></div>
+<h3 id="starting-the-recursion-and-plotting">Starting the Recursion and Plotting</h3>
+<p>The last thing we need so that we can see our splits is to figure out how to start our recursion and then take the <code>ftbs</code> list and iterate over it to draw the split lines on our plot. So what we really want is the following function that accepts a scikit-learn <code>Tree</code> object and an Axis object to plot on.</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> plot_split_lines(tree, ax):
+    feats_threshs_bounds <span class="op">=</span> []
+    get_split_lines(feats_threshs_bounds, <span class="dv">0</span>,
+                    (ax.get_xlim(), ax.get_ylim()),
+                    <span class="va">False</span>, tree.feature, tree.threshold,
+                    tree.children_left, tree.children_right)
+    <span class="cf">for</span> feature, threshold, (x_bounds, y_bounds) <span class="kw">in</span> feats_threshs_bounds:
+        <span class="cf">if</span> feature <span class="op">==</span> <span class="dv">1</span>:
+            ax.plot(x_bounds, (threshold, threshold), <span class="st">'k-'</span>, lw<span class="op">=</span><span class="fl">0.5</span>)
+        <span class="cf">else</span>:
+            ax.plot((threshold, threshold), y_bounds, <span class="st">'k-'</span>, lw<span class="op">=</span><span class="fl">0.5</span>)</code></pre></div>
+<p>This function is super simple, it makes an empty list that will hold all the features, thresholds and bounds. Then it makes the first call to <code>get_split_lines</code> passing it the empty list it just created, the node id for the root of the tree, <code>0</code>, the boundaries of the <code>Axis</code> it was passed, False for whether or not it’s at a leaf, and all of the arrays holding the split information from the <code>Tree</code>. Then is simply iterates over the list that gets mutated in place during all the recursive calls, and depending on what feature was selected it plots a line on the appropriate axis. Let’s see what it produces.</p>
+<div class="mpl" style="text-align: center">
+<img src="../../images/decision_tree_viz/dt_decision_regions_splits_close.png" style="width: 450px">
+</div>
+<p>This is pretty close! But, what’s with the line over on the left side??</p>
+<p>It took me a couple of minutes to figure this out. But eventually I realized that scikit-learn must be “choosing” a split sometime to catch all of the points. No matter. I just added a conditional to make sure that the function only recurses if the split is within the boundaries of the feature that was chosen. And so, the final version of the function!</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> get_split_lines(ftbs, node_id, bounds, leaf,
+                    features, thresholds, children_left, children_right):
+    <span class="cf">if</span> leaf: <span class="cf">return</span>
+
+    x_bounds, y_bounds <span class="op">=</span> bounds
+    feature, threshold <span class="op">=</span> features[node_id], thresholds[node_id]
+    left_child, right_child <span class="op">=</span> children_left[node_id], children_right[node_id]
+     
+    feature_bounds <span class="op">=</span> bounds[feature]
+    <span class="cf">if</span> feature_bounds[<span class="dv">0</span>] <span class="op">&lt;=</span> threshold <span class="op">&lt;=</span> feature_bounds[<span class="dv">1</span>]:
+        ftbs.append((feature, threshold, bounds))
+        <span class="cf">if</span> feature <span class="op">==</span> <span class="dv">1</span>:
+            left_bounds <span class="op">=</span> (x_bounds, (y_bounds[<span class="dv">0</span>], threshold))
+            right_bounds <span class="op">=</span> (x_bounds, (threshold, y_bounds[<span class="dv">1</span>]))
+        <span class="cf">else</span>:
+            left_bounds <span class="op">=</span> ((x_bounds[<span class="dv">0</span>], threshold), y_bounds)
+            right_bounds <span class="op">=</span> ((threshold, x_bounds[<span class="dv">1</span>]), y_bounds)
+    <span class="cf">else</span>:
+        right_bounds <span class="op">=</span> left_bounds <span class="op">=</span> bounds
+
+    get_split_lines(ftbs, left_child, left_bounds, left_child <span class="op">==</span> node_id,
+                       features, thresholds, children_left, children_right)
+    get_split_lines(ftbs, right_child, right_bounds, right_child <span class="op">==</span> node_id,
+                       features, thresholds, children_left, children_right)</code></pre></div>
+<p>And here’s what it creates on the same large tree from above.</p>
+<div class="mpl" style="text-align: center">
+<img src="../../images/decision_tree_viz/big_dt_decision_regions_splits.png" style="width: 450px">
+</div>
+<h1 id="conclusion">Conclusion</h1>
+<p>Well there you have it. Some code that plots the split lines for an scikit-learn decision tree. Along the way we took a look at some scikit-learn source code, got to play around with recursion. I don’t know what more I could ask for.</p>
+    </section>
+</article>
+
+        </main>
+
+        <footer>
+            Site proudly generated by
+            <a href="http://jaspervdj.be/hakyll">Hakyll</a>
+        </footer>
+    </body>
+</html>

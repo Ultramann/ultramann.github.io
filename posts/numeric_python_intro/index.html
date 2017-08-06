@@ -11,7 +11,7 @@
     <body>
         <header>
             <div class="logo">
-                <a href="../../"><img alt="mlml" src="../../images/mlml.png" width="12%"></a>
+                <a href="../../"><img alt="mlml" src="../../images/base/mlml.png" width="12%"></a>
             </div>
             <nav>
                 <a href="../../">Home</a>
@@ -80,7 +80,7 @@
 <p>In fact, in many situations, like the add 2 one above, we won’t even need to write a loop to perform our operation! “How is possible?”, you ask. Through the magic of the second feature of NumPy listed above, <a href="https://docs.scipy.org/doc/numpy/user/basics.broadcasting.html">broadcasting</a>.</p>
 <p>Broadcasting, also known as vectorization, provides a way to express operations over an entire array instead of having a manually loop over every individual element. Let’s see this applied to our add 2 example in a picture then in code.</p>
 <div style="text-align: center">
-<img src="../../images/broadcasting.png" style="width: 700px">
+<img src="../../images/numeric_python_intro/broadcasting.png" style="width: 700px">
 </div>
 <p>All NumPy does when you try to add a single number to an array is infer that you want to add it to every individual element of the array. The really cool thing about this is that NumPy doesn’t actually make an array full of 2s. Instead it actually performs the exact same loop we saw above, but it does it behind the scenes in C instead of Python.</p>
 <p>We can see an equivalence of these two interpretations in the following code block. <strong>Note:</strong> The first one is actually faster because we don’t have to move between copies of 2.</p>
@@ -95,7 +95,7 @@ array([<span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5<
 <pre><code>Try to find the centers of blobs of that already &quot;exist&quot; within a dataset.</code></pre>
 <p>The following image, hopefully in the more intuitive visual way, demonstrates what is meant by “centers” and “blobs”.</p>
 <div class="mpl" style="text-align: center">
-<img src="../../images/example_clustering.png" style="width: 450px">
+<img src="../../images/numeric_python_intro/example_clustering.png" style="width: 450px">
 </div>
 <p><strong>Note:</strong> In practice these “blobs” exist in a space with many more than two dimensions. The above plot and the rest in this tutorial are presented in 2 dimensions solely as a device to gain intuition for what we’re trying to accomplish with k-means.</p>
 <h2 id="why-k-means">Why k-means</h2>
@@ -231,20 +231,20 @@ array([ <span class="dv">3</span>.,  <span class="dv">4</span>.])</code></pre></
 <h3 id="comparison">Comparison</h3>
 <p>It’s high time to inspect that promise made by the title of the repository; to check and compare the performance of our two implementations. The demo script has this ability built in. In fact, if you don’t pass any flags it will compare the base Python version with the NumPy version in a side by side plot by default. Both versions are timed while running and their run time is displayed in the title of each sub-plot. Thus, running <code>python demo.py</code> at the command line will produce a plot like the one below.</p>
 <div class="mpl" style="text-align: center">
-<img src="../../images/comparison_100.png" style="width: 900px">
+<img src="../../images/numeric_python_intro/comparison_100.png" style="width: 900px">
 </div>
 <p>We can see that running the base Python version took about half of a second, whereas the NumPy version finished in a tenth of a second. <strong>Note:</strong> These times are for the 1000 updates on 100 data points that the script generates by default and on a 2013 MacBook Pro with a 2.6 GHz i5 processor.</p>
 <p>This difference of approximately 0.4 seconds might not seem bad, but consider that this means the base version is about 5 times slower. Further, we need to remember that this example only uses 100 data points. The real power will become apparent when we scale to a more realistic number. To test this, we can use the demo script’s “count” flag and pass it a number after. The plot below was produced with the command <code>python demo.py --count 1000</code>.</p>
 <div class="mpl" style="text-align: center">
-<img src="../../images/comparison_1000.png" style="width: 900px">
+<img src="../../images/numeric_python_intro/comparison_1000.png" style="width: 900px">
 </div>
 <p>Here we see that the runtime of the base Python version has grown linearly, 10 times more data points taking ten times as long, whereas the NumPy version is only taking 50% longer. In addition, at this point the NumPy version is running about 20 times faster than the base version. That’s what I call a performance increase! Last example for dramatic purposes. 10000 points, which is finally getting closer to the size of data we might want to analyze. I’ll let you be the judge.</p>
 <div class="mpl" style="text-align: center">
-<img src="../../images/comparison_10000.png" style="width: 900px">
+<img src="../../images/numeric_python_intro/comparison_10000.png" style="width: 900px">
 </div>
 <p>For the final comparison of NumPy vs base Python implementations, below we can see how long it takes each version of the algorithm to go through 1000 iterations of k-means clustering updates on progressively larger data sets. You can see that while the run time of the base Python version is linear, the NumPy version grows in what appears to be sub-log time.</p>
 <div class="mpl" style="text-align: center">
-<img src="../../images/kmeans_time_comp.png" style="width: 450px">
+<img src="../../images/numeric_python_intro/kmeans_time_comp.png" style="width: 450px">
 </div>
 <h1 id="just-the-beginning">Just the Beginning</h1>
 <p>This tutorial covered some introductory level NumPy ideas, primarily arrays and broadcasting. We learned that we can get around some of the time penalties we pay for duck typing by using an array, which, by definition are homogeneous. In addition, the method that always for speedy processing of the data in these arrays is a process called broadcasting.</p>
