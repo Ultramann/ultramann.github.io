@@ -9,8 +9,8 @@ import Hakyll
 main :: IO ()
 main = do
   (arg:_) <- getArgs 
-  let posts = fromGlob $ "posts/" ++ if arg == "watch" || arg == "preview"
-                                       then "**" else "*"
+  let posts = fromGlob $ "posts/" ++ if arg == "watch" then "**" else "*"
+
   hakyllWith siteConf $ do
     match "images/**" $ do
       route   idRoute
