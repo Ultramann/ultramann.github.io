@@ -69,7 +69,7 @@ In fact, in many situations, like the add 2 one above, we won't even need to wri
 
 Broadcasting, also known as vectorization, provides a way to express operations over an entire array instead of having a manually loop over every individual element. Let's see this applied to our add 2 example in a picture then in code.
 
-<div style="text-align: center"><img src="/images/broadcasting.png" style="width: 700px"></div>
+<div style="text-align: center"><img src="/images/numeric_python_intro/broadcasting.png" style="width: 700px"></div>
 
 All NumPy does when you try to add a single number to an array is infer that you want to add it to every individual element of the array. The really cool thing about this is that NumPy doesn't actually make an array full of 2s. Instead it actually performs the exact same loop we saw above, but it does it behind the scenes in C instead of Python.
 
@@ -94,7 +94,7 @@ Now let's look at an algorithm, k-means, to serve as a medium for observing a ne
 
 The following image, hopefully in the more intuitive visual way, demonstrates what is meant by "centers" and "blobs".
 
-<div class="mpl" style="text-align: center"><img src="/images/example_clustering.png" style="width: 450px"></div>
+<div class="mpl" style="text-align: center"><img src="/images/numeric_python_intro/example_clustering.png" style="width: 450px"></div>
 
 **Note:** In practice these "blobs" exist in a space with many more than two dimensions. The above plot and the rest in this tutorial are presented in 2 dimensions solely as a device to gain intuition for what we're trying to accomplish with k-means.
 
@@ -298,21 +298,21 @@ And that's it! As with the base Python implementation you can run the demo scrip
 
 It's high time to inspect that promise made by the title of the repository; to check and compare the performance of our two implementations. The demo script has this ability built in. In fact, if you don't pass any flags it will compare the base Python version with the NumPy version in a side by side plot by default. Both versions are timed while running and their run time is displayed in the title of each sub-plot. Thus, running `python demo.py` at the command line will produce a plot like the one below.
 
-<div class="mpl" style="text-align: center"><img src="/images/comparison_100.png" style="width: 900px"></div>
+<div class="mpl" style="text-align: center"><img src="/images/numeric_python_intro/comparison_100.png" style="width: 900px"></div>
 
 We can see that running the base Python version took about half of a second, whereas the NumPy version finished in a tenth of a second. **Note:** These times are for the 1000 updates on 100 data points that the script generates by default and on a 2013 MacBook Pro with a 2.6 GHz i5 processor.
 
 This difference of approximately 0.4 seconds might not seem bad, but consider that this means the base version is about 5 times slower. Further, we need to remember that this example only uses 100 data points. The real power will become apparent when we scale to a more realistic number. To test this, we can use the demo script's "count" flag and pass it a number after. The plot below was produced with the command `python demo.py --count 1000`.
 
-<div class="mpl" style="text-align: center"><img src="/images/comparison_1000.png" style="width: 900px"></div>
+<div class="mpl" style="text-align: center"><img src="/images/numeric_python_intro/comparison_1000.png" style="width: 900px"></div>
 
 Here we see that the runtime of the base Python version has grown linearly, 10 times more data points taking ten times as long, whereas the NumPy version is only taking 50% longer. In addition, at this point the NumPy version is running about 20 times faster than the base version. That's what I call a performance increase! Last example for dramatic purposes. 10000 points, which is finally getting closer to the size of data we might want to analyze. I'll let you be the judge.
 
-<div class="mpl" style="text-align: center"><img src="/images/comparison_10000.png" style="width: 900px"></div>
+<div class="mpl" style="text-align: center"><img src="/images/numeric_python_intro/comparison_10000.png" style="width: 900px"></div>
 
 For the final comparison of NumPy vs base Python implementations, below we can see how long it takes each version of the algorithm to go through 1000 iterations of k-means clustering updates on progressively larger data sets. You can see that while the run time of the base Python version is linear, the NumPy version grows in what appears to be sub-log time.
 
-<div class="mpl" style="text-align: center"><img src="/images/kmeans_time_comp.png" style="width: 450px"></div>
+<div class="mpl" style="text-align: center"><img src="/images/numeric_python_intro/kmeans_time_comp.png" style="width: 450px"></div>
 
 # Just the Beginning
 
