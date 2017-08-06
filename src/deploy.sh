@@ -25,7 +25,7 @@ failed() {
 alert "Removed old site files..."
 if [ ! -d $DEPLOY ]; then
   update "no deploy folder. Cloning..."
-  git clone "$REMOTE" deploy &> /dev/null || failed
+  git clone -b master "$REMOTE" deploy &> /dev/null || failed
 fi
 rm -rf "$DEPLOY"/*
 successful
