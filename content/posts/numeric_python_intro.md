@@ -5,7 +5,7 @@ published: July 21, 2017
 
 This post is a tutorial style introduction to discovering numeric performance optimizations in the Python programming language. It assumes only a cursory knowledge of Python and a tolerance for pinches of math.
 
-The source code for everything in this tutorial can be found [here](https://github.com/Ultramann/Numeric-Python-Intro). Requisite Python libraries to run the included code are: `scipy`, `numpy`, and `matplotlib`.
+The source code for everything in this tutorial can be found [here](https://github.com/Ultramann/Numeric-Python-Intro). The code in the repository linked above depend on: `scipy`, `numpy`, and `matplotlib`.
 
 <!--more-->
 
@@ -21,7 +21,7 @@ The source code for everything in this tutorial can be found [here](https://gith
         1. [Base Python](#base-python)
         2. [NumPy Accelerated](#numpy-accelerated)
         3. [Comparison](#comparison)
-3. [Just the Beginning](#just-the-beginning)
+3. [Conclusion](#conclusion)
 
 # NumPy
 
@@ -44,7 +44,7 @@ As this repository intends simply to introduce NumPy we will be focusing on the 
 
 So we have some intuition for one of the reasons using NumPy might give us faster code let's discuss type systems for a moment.
 
-Python is colloquially referred to a duck typed language, deriving from thr phrase now known as the duck test, "If it looks like a duck, swims like a duck, and quacks like a duck, then it probably is a duck." You might be wondering, how in the world is this saying applicable to programming, aka, what's all this quack about?
+Python is colloquially referred to a duck typed language, deriving from the phrase now known as the duck test, "If it looks like a duck, swims like a duck, and quacks like a duck, then it probably is a duck." You might be wondering, how in the world is this saying applicable to programming, aka, what's all this quack about?
 
 In Python, since it's an interpreted language, when you type the command `4 + 5` it doesn't __*know*__ what 4 and 5 are so it has to go check to see if you can add them together. As it turns out, you can, so Python will return `9` of type integer since that was the type of the two numbers we started with.
 
@@ -161,7 +161,7 @@ The first part makes an empty list of lists. Corresponding by index, each of the
 
 The second part initializes variables `closest_dist` and `closest_centroid` to be updated by the inner loop discussed in part three. Once the inner loop is complete and the closest centroid discovered for a data point, that data point is appended to the list in `centroid_assignments` corresponding to it's `closest_centroid` index.
 
-The third part loops over all of the centroids updating the closest one if the current centroids distance is less than the closest centroid it's seen so far. To calculate distance it uses the function `list_euclidean_dist`. Here is its code:
+The third part loops over all of the centroids updating the closest one if the distance to the current centroid  is less than the closest centroid it's seen so far. To calculate distance it uses the function `list_euclidean_dist`. It has fairly simple code.
 
 ```python
 def list_euclidean_dist(a, b):
@@ -187,7 +187,7 @@ This function which takes the output of `get_new_assignments`, a list of lists o
 2. initialize a new list to hold the values of a single new centroid,
 3. a nested loop over the dimensions of the data points, finding the average value for each.
 
-Parts 1 and 2 are pretty self-explanatory; part 3, though has some slightly shifty things going on. Much of this shiftiness happens in the `for dim in zip(*centroid_assignment)`. In case you haven't encountered it before, the `*` before an iterable "unpacks" it. What this means is that all the lists, here data points, in `centroid_assignment` are pulled apart; when they are immediately zipped back together all of the first elements of the original lists are grouped together, then the second ones, etc.
+Parts 1 and 2 are pretty self-explanatory; part 3, though has some slightly shifty things going on. Much of this shiftiness happens in the `for dim in zip(*centroid_assignment)`. In case you haven't encountered it before, the `*` before a list or tuple "unpacks" it. What this means is that all the lists, here data points, in `centroid_assignment` are pulled apart; when they are immediately zipped back together all of the first elements of the original lists are grouped together, then the second ones, etc.
 
 Let's look at a toy example so we can "see" what's going on:
 
@@ -300,13 +300,13 @@ It's high time to inspect that promise made by the title of the repository; to c
 
 <div class="mpl" style="text-align: center"><img src="/images/numeric_python_intro/comparison_100.png" style="width: 900px"></div>
 
-We can see that running the base Python version took about half of a second, whereas the NumPy version finished in a tenth of a second. **Note:** These times are for the 1000 updates on 100 data points that the script generates by default and on a 2013 MacBook Pro with a 2.6 GHz i5 processor.
+We can see that running the base Python version took about a third of a second, whereas the NumPy version finished in under a tenth of a second. **Note:** These times are for the 1000 updates on 100 data points that the script generates by default on an Intel Xeon 2.40GHz processor.
 
-This difference of approximately 0.4 seconds might not seem bad, but consider that this means the base version is about 5 times slower. Further, we need to remember that this example only uses 100 data points. The real power will become apparent when we scale to a more realistic number. To test this, we can use the demo script's "count" flag and pass it a number after. The plot below was produced with the command `python demo.py --count 1000`.
+This difference of approximately 0.3 seconds might not seem bad, but consider that this means the base version is about 5 times slower. Further, we need to remember that this example only uses 100 data points. The real power will become apparent when we scale to a more realistic number. To test this, we can use the demo script's "count" flag and pass it a number after. The plot below was produced with the command `python demo.py --count 1000`.
 
 <div class="mpl" style="text-align: center"><img src="/images/numeric_python_intro/comparison_1000.png" style="width: 900px"></div>
 
-Here we see that the runtime of the base Python version has grown linearly, 10 times more data points taking ten times as long, whereas the NumPy version is only taking 50% longer. In addition, at this point the NumPy version is running about 20 times faster than the base version. That's what I call a performance increase! Last example for dramatic purposes. 10000 points, which is finally getting closer to the size of data we might want to analyze. I'll let you be the judge.
+Here we see that the runtime of the base Python version has grown linearly, 10 times more data points taking ten times as long, whereas the NumPy version is only taking 50% longer. In addition, at this point the NumPy version is running about 25 times faster than the base version. That's what I call a performance difference! Last example for dramatic purposes. 10000 points, which is finally getting closer to the size of data we might want to analyze. I'll let you be the judge.
 
 <div class="mpl" style="text-align: center"><img src="/images/numeric_python_intro/comparison_10000.png" style="width: 900px"></div>
 
@@ -314,7 +314,7 @@ For the final comparison of NumPy vs base Python implementations, below we can s
 
 <div class="mpl" style="text-align: center"><img src="/images/numeric_python_intro/kmeans_time_comp.png" style="width: 450px"></div>
 
-# Just the Beginning
+# Conclusion
 
 This tutorial covered some introductory level NumPy ideas, primarily arrays and broadcasting. We learned that we can get around some of the time penalties we pay for duck typing by using an array, which, by definition are homogeneous. In addition, the method that always for speedy processing of the data in these arrays is a process called broadcasting.
 
