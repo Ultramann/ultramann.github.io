@@ -1,8 +1,9 @@
 from sklearn.tree import DecisionTreeClassifier
-import matplotlib
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import decision_tree_viz as dtv
+
+
+SAVE_PATH = 'content/images/decision_tree_viz/{}.png'
 
 
 def plot_decision_tree(X, y, title, file_name, plot_splits, md=2):
@@ -26,7 +27,7 @@ def plot_decision_tree(X, y, title, file_name, plot_splits, md=2):
         dtv.plot_split_lines(dt.tree_, ax)
     dtv.remove_ticks(ax)
     fig.suptitle(title, fontsize=25)
-    plt.savefig('../../content/images/decision_tree_viz/{}.png'.format(file_name), transparent=True)
+    plt.savefig(SAVE_PATH.format(file_name), transparent=True)
 
 
 if __name__ == '__main__':
