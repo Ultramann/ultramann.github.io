@@ -45,30 +45,24 @@
 <li><code>cabal init</code>: this sets up the package and makes a <code>.cabal</code> file.</li>
 <li>Make <code>.hs</code> file that is the launch point of the package (this will get imported when you run <code>cabal repl</code>)</li>
 <li>In the <code>.cabal</code> file define some exposed module. This is important, needs to exist along with its corresponding <code>.hs</code> file, otherwise <code>cabal repl</code> won’t work.</li>
-<li>Install packages, this can either happen with:</li>
-</ol>
+<li>Install packages, this can either happen with:
 <ul>
 <li><code>cabal install -j &lt;package name&gt;</code>, or</li>
 <li>if you’ve added other packages to the <code>build-depends</code> list in the <code>.cabal</code> file you can run: <code>cabal install -j --only-dependencies</code>.</li>
 <li>The <code>-j</code> parallizes installation, by default it uses the number of cpus, you can optionally specify a number.</li>
-</ul>
-<ol start="5" style="list-style-type: decimal">
+</ul></li>
 <li>You can run <code>cabal repl</code> now, this will drop you into ghci with the exposed module already loaded.</li>
 </ol>
 <h2 id="other-cabal-abilites">Other Cabal-abilites</h2>
 <ul>
-<li>Binaries that are installed by cabal are available via: <code>cabal exec &lt;name_of_binary</code>. e.g. <code>cabal exec hakyll-init .</code></li>
-<li>After <code>cabal build</code>ing, if the target was an executable (this would be specified in the <code>.cabal</code> file), you can run the binaries with <code>cabal run &lt;name_of_execuatble</code>. The name of this executable matches the one specified in the <code>.cabal</code> file.</li>
+<li>Binaries that are installed by cabal are available via: <code>cabal exec &lt;name_of_binary&gt;</code>. e.g. <code>cabal exec hakyll-init .</code></li>
+<li>After <code>cabal build</code>ing, if the target was an executable (this would be specified in the <code>.cabal</code> file), you can run the binaries with <code>cabal run &lt;name_of_execuatble&gt;</code>. The name of this executable matches the one specified in the <code>.cabal</code> file.</li>
 </ul>
-<p><code>cabal run site watch</code></p>
+<p><code>cabal run site watch</code> * It looks like under the hood, when you run <code>cabal build</code>, cabal is doing all of the ghc calls for you while making sure that packages are available. Once the program is compiled it puts the executable in the <code>dist</code> folder. Running <code>cabal run &lt;name_of_execuatble&gt;</code> tells cabal to go find the executable by name and run it.</p>
 <ul>
 <li>When you want to pass options, flags, to programs that are run with <code>cabal run</code> use a <code>--</code> to separate them. e.g.</li>
 </ul>
 <p><code>cabal run site watch -- --host 0.0.0.0</code></p>
-<h2 id="todo">TODO</h2>
-<ol style="list-style-type: decimal">
-<li>Learn what <code>cabal build</code> does.</li>
-</ol>
     </section>
 </article>
 
