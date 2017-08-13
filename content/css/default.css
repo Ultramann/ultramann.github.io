@@ -37,11 +37,20 @@ footer {
     font-size: 12px;
     margin-top: 30px;
     padding: 12px 0px 12px 0px;
-    text-align: right;
 }
 
 footer a {
     color: #0e85ff;
+}
+
+footer img {
+    float: left;
+    margin-right: 0.5%;
+}
+
+footer div {
+    text-align: right;
+    margin-top: 5px;
 }
 
 h1, h2, h3, h4 {
