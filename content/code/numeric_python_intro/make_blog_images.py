@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-SAVE_PATH = 'content/images/numeric_python_intro/{}.png'
+SAVE_PATH = '../images/numeric_python_intro/{}.png'
 
 
 def make_blobs(n_points):

@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import decision_tree_viz as dtv
 
 
-SAVE_PATH = 'content/images/decision_tree_viz/{}.png'
+SAVE_PATH = '../images/decision_tree_viz/{}.png'
 
 
 def plot_decision_tree(X, y, title, file_name, plot_splits, md=2):
