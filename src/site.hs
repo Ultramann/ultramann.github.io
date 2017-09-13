@@ -12,7 +12,7 @@ main = do
   let posts = fromGlob $ "posts/" ++ if arg == "watch" then "**" else "*"
 
   hakyllWith siteConf $ do
-    match "images/**" $ do
+    match ("images/**" .||. "js/*") $ do
       route   idRoute
       compile copyFileCompiler
 
@@ -24,47 +24,45 @@ main = do
       route   $ niceRoute ""
       compile $ pandocCompiler
             >>= loadAndApplyTemplate "templates/base.html" defaultContext
-            >>= relativizeUrls
 
     match posts $ do
       route $ niceRoute "posts/"
       compile $ pandocCompiler
-            >>= loadAndApplyTemplate "templates/post.html" postCtx
             >>= saveSnapshot "teaser"
-            >>= loadAndApplyTemplate "templates/base.html" postCtx
-            >>= relativizeUrls
+            >>= loadAndApplyTemplate "templates/byte.html" byteCtx
+            >>= loadAndApplyTemplate "templates/base.html" byteCtx
+
+    match "notes/*" $ do
+      route $ niceRoute "notes/"
+      compile $ pandocCompiler
+            >>= saveSnapshot "teaser"
+            >>= loadAndApplyTemplate "templates/byte.html" byteCtx
+            >>= loadAndApplyTemplate "templates/base.html" byteCtx
 
     create ["posts.html"] $ do
       route   $ niceRoute ""
       compile $ do
         posts <- recentFirst =<< loadAll posts
-        let archiveCtx = listField "posts" postCtx (return posts)
-                      <> constField "title" "Past Posts"
+        let archiveCtx = listField "bytes" byteCtx (return posts)
+                      <> constField "title" "Posts"
                       <> defaultContext
 
         makeItem ""
-          >>= loadAndApplyTemplate "templates/posts.html" archiveCtx
+          >>= loadAndApplyTemplate "templates/bytes.html" archiveCtx
           >>= loadAndApplyTemplate "templates/base.html"  archiveCtx
           >>= relativizeUrls
           >>= cleanIndexUrls
-
-    match "notes/*" $ do
-      route $ niceRoute "notes/"
-      compile $ pandocCompiler
-            >>= loadAndApplyTemplate "templates/post.html" postCtx
-            >>= loadAndApplyTemplate "templates/base.html" postCtx
-            >>= relativizeUrls
 
     create ["notes.html"] $ do
       route   $ niceRoute ""
       compile $ do
         notes <- recentFirst =<< loadAll "notes/*"
-        let archiveCtx = listField "posts" postCtx (return notes)
+        let archiveCtx = listField "bytes" byteCtx (return notes)
                       <> constField "title" "Notes"
                       <> defaultContext
 
         makeItem ""
-          >>= loadAndApplyTemplate "templates/notes.html" archiveCtx
+          >>= loadAndApplyTemplate "templates/bytes.html" archiveCtx
           >>= loadAndApplyTemplate "templates/base.html"  archiveCtx
           >>= relativizeUrls
           >>= cleanIndexUrls
@@ -74,9 +72,8 @@ main = do
       compile $ do
         posts <- recentFirst =<< loadAll posts
         notes <- recentFirst =<< loadAll "notes/*"
-        let homePostCtx = teaserField "teaser" "teaser" <> postCtx
-            indexCtx = listField "posts" homePostCtx (return (take 1 posts))
-                    <> listField "notes" postCtx (return (take 6 notes))
+        let indexCtx = listField "posts" byteCtx (return (take 1 posts))
+                    <> listField "notes" byteCtx (return (take 6 notes))
                     <> constField "title" "Mostly Literate Machine Learning"
                     <> defaultContext
 
@@ -96,8 +93,10 @@ siteConf = defaultConfiguration { deployCommand        = "bash src/deploy.sh"
                                 , providerDirectory    = "content"
                                 , previewHost          = "0.0.0.0" }
 
-postCtx :: Context String
-postCtx = dateField "date" "%B %e, %Y" <> defaultContext
+byteCtx :: Context String
+byteCtx = teaserField "teaser" "teaser"
+       <> dateField "date" "%b %e, %Y"
+       <> defaultContext
 
 niceRoute :: String -> Routes
 niceRoute prefix = customRoute $ \ident -> prefix ++ (takeBaseName . toFilePath $ ident) ++ "/index.html"

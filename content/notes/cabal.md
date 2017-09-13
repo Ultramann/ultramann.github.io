@@ -3,6 +3,10 @@ title: Cabal Notes
 published: July 23, 2017
 ---
 
+Notes on the Cabal install tool.
+
+<!--more-->
+
 # Getting Started with Cabal
 
 ## Installing
