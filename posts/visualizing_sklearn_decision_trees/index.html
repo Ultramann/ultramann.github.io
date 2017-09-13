@@ -1,24 +1,27 @@
 <!doctype html>
 <html lang="en">
     <head>
-        <link rel="icon" href="../../images/base/favicon.ico">
+        <link rel="icon" href="/images/base/favicon.ico">
         <meta charset="utf-8">
         <meta http-equiv="x-ua-compatible" content="ie=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Visualizing scikit-learn Decision Trees</title>
-        <link rel="stylesheet" href="../../css/default.css" />
-        <link rel="stylesheet" href="../../css/syntax.css" />
+        <link rel="stylesheet" href="/css/default.css" />
+        <link rel="stylesheet" href="/css/syntax.css" />
+
+        <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+        <script src="/js/ultramann.js"></script>
     </head>
     <body>
         <header>
             <div class="logo">
-                <a href="../../"><img alt="mlml" src="../../images/base/mlml.png" width="12%"></a>
+                <a href="/"><img alt="mlml" src="/images/base/mlml.png" width="12%"></a>
             </div>
             <nav>
-                <a href="../../">Home</a>
-                <a href="../../about/">About</a>
-                <a href="../../notes/">Notes</a>
-                <a href="../../posts/">Posts</a>
+                <a href="/">Home</a>
+                <a href="/about/">About</a>
+                <a href="/notes/">Notes</a>
+                <a href="/posts/">Posts</a>
             </nav>
         </header>
 
@@ -26,7 +29,7 @@
             <h1 class="title">Visualizing scikit-learn Decision Trees</h1>
             <article>
     <section class="header">
-        <i>Posted on August 12, 2017</i>
+        <i>Posted on Aug 12, 2017</i>
     </section>
     <section>
         <p>Decision trees aren’t an insanely difficult concept to grasp. But this doesn’t mean a good visualization of a trained decision tree can’t help develop a deeper understanding of the model.</p>
@@ -38,12 +41,12 @@
 <h1 id="starting-point">Starting Point</h1>
 <p>One thing that’s actually pretty easy to do with classification models is plot their decision regions; note, I’ll only be working with classifiers because of this quality. Let’s take a look at what you get with some sample data, and roughly the strategy used in a scikit-learn tutorial found <a href="http://scikit-learn.org/stable/auto_examples/tree/plot_iris.html">here</a>. The function to generate the plot below, <code>plot_decision_regions</code>, for plotting the decision regions can be found in the source linked above. Note that we really can’t do a great job plotting decision boundaries in greater than two dimensions. So this post will only be looking at data in two dimensions.</p>
 <div class="mpl" style="text-align: center">
-<img src="../../images/decision_tree_viz/dt_decision_regions.png" style="width: 450px">
+<img src="/images/decision_tree_viz/dt_decision_regions.png" style="width: 450px">
 </div>
 <p><code>plot_decision_regions</code> works by creating a grid of points (using <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.meshgrid.html"><code>np.meshgrid</code></a>), lots of points, and running each of those points through the fitted decision tree to get a prediction. Then all of those predictions are plotted (using <a href="https://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.contourf"><code>plt.contourf</code></a>) creating the illusion that a complete decision regions are known.</p>
 <p>From the decision regions above you could pretty easily infer the splits that were made in the decision tree. I mean, there were only three splits. But consider what happens when the data and therefore the decision tree gets bigger.</p>
 <div class="mpl" style="text-align: center">
-<img src="../../images/decision_tree_viz/big_dt_decision_regions.png" style="width: 450px">
+<img src="/images/decision_tree_viz/big_dt_decision_regions.png" style="width: 450px">
 </div>
 <p>To be quite honest, it’d be fair to say that having the explicit split lines plotted on the image above wouldn’t really make it “easier” to understand what splits were made, much less why. But, I definitely don’t think they hurt. Either way, you’ll be able to decide for yourself soon.</p>
 <h1 id="decision-trees-in-scikit-learn">Decision Trees in scikit-learn</h1>
@@ -70,7 +73,7 @@
 <p>You can find the path to a library is being imported from as it’s defined as a dunder attribute on the reference when imported. Aka, if you import a library, say, <code>sklearn</code> you can find out where it’s file is by accessing it’s <code>__file__</code> attribute.</p>
 <div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> sklearn
 <span class="op">&gt;&gt;&gt;</span> sklearn.<span class="va">__file__</span>
-<span class="co">'/Users/Ultramann/anaconda3/lib/python3.5/site-packages/sklearn/__init__.py'</span></code></pre></div>
+<span class="co">&#39;/Users/Ultramann/anaconda3/lib/python3.5/site-packages/sklearn/__init__.py&#39;</span></code></pre></div>
 <p>For the record, the advice I espoused here will not be useful in the next section the <code>_tree</code> script is actually written in Cython, and on your system it’s going to be compiled. So we’re basically relegated to looking through the source in github. :-/</p>
 <h3 id="cython-time">Cython Time</h3>
 <p>As mentioned above, when I went to look for the <code>_tree</code> source in my scikit-learn directory, I could not find any source code. So it was off to github.</p>
@@ -82,7 +85,7 @@
 <p>One of the first things that I was thinking prior to all this digging into scikit-learn source was that I’d be writing the code to tear apart the tree recursively. In line with the discussion of the tree building process above, this doesn’t directly match with either the most pythonic approach to the problem, nor iterative process used to build the tree. On this note I’m punting since recursion, while not particularly pythonic, is cool and definitely faster for my brain and fingers to code up. The only potential downfall to choosing the recursion path is that Python enforces a default recursion depth limit of somewhere around 1000. So I could potentially run into that if I tried to recursively break down a scikit-learn tree that is <em>HUGE</em>. Good to know the limitations upfront and I’m willing to accept those potential future consequences. Moving on.</p>
 <p>For a reference to aim for, this is what we’re trying to create.</p>
 <div class="mpl" style="text-align: center">
-<img src="../../images/decision_tree_viz/dt_decision_regions_splits.png" style="width: 450px">
+<img src="/images/decision_tree_viz/dt_decision_regions_splits.png" style="width: 450px">
 </div>
 <h2 id="strategy">Strategy</h2>
 <p>Since I’ve already decided that I’m going to use a recursive approach to traverse down the tree I’m positioned quite well to take a <a href="https://en.wikipedia.org/wiki/Top-down_and_bottom-up_design">top-down</a> strategy to implementing this function. Top-down programming is going to be really effective here because I already know what the structure of a recursive function looks like. And even though I don’t know the parameters that this function should be taking yet, nor what it should be returning, if anything, the top-down process will help me discover these things naturally.</p>
@@ -194,12 +197,12 @@
                     tree.children_left, tree.children_right)
     <span class="cf">for</span> feature, threshold, (x_bounds, y_bounds) <span class="kw">in</span> feats_threshs_bounds:
         <span class="cf">if</span> feature <span class="op">==</span> <span class="dv">1</span>:
-            ax.plot(x_bounds, (threshold, threshold), <span class="st">'k-'</span>, lw<span class="op">=</span><span class="fl">0.5</span>)
+            ax.plot(x_bounds, (threshold, threshold), <span class="st">&#39;k-&#39;</span>, lw<span class="op">=</span><span class="fl">0.5</span>)
         <span class="cf">else</span>:
-            ax.plot((threshold, threshold), y_bounds, <span class="st">'k-'</span>, lw<span class="op">=</span><span class="fl">0.5</span>)</code></pre></div>
+            ax.plot((threshold, threshold), y_bounds, <span class="st">&#39;k-&#39;</span>, lw<span class="op">=</span><span class="fl">0.5</span>)</code></pre></div>
 <p>This function is super simple, it makes an empty list that will hold all the features, thresholds and bounds. Then it makes the first call to <code>get_split_lines</code> passing it the empty list it just created, the node id for the root of the tree, <code>0</code>, the boundaries of the <code>Axis</code> it was passed, False for whether or not it’s at a leaf, and all of the arrays holding the split information from the <code>Tree</code>. Then is simply iterates over the list that gets mutated in place during all the recursive calls, and depending on what feature was selected it plots a line on the appropriate axis. Let’s see what it produces.</p>
 <div class="mpl" style="text-align: center">
-<img src="../../images/decision_tree_viz/dt_decision_regions_splits_close.png" style="width: 450px">
+<img src="/images/decision_tree_viz/dt_decision_regions_splits_close.png" style="width: 450px">
 </div>
 <p>This is pretty close! But, what’s with the line over on the left side??</p>
 <p>It took me a couple of minutes to figure this out. But eventually I realized that scikit-learn must be “choosing” a split sometime to catch all of the points. No matter. I just added a conditional to make sure that the function only recurses if the split is within the boundaries of the feature that was chosen. And so, the final version of the function!</p>
@@ -229,7 +232,7 @@
                        features, thresholds, children_left, children_right)</code></pre></div>
 <p>And here’s what it creates on the same large tree from above. Nice.</p>
 <div class="mpl" style="text-align: center">
-<img src="../../images/decision_tree_viz/big_dt_decision_regions_splits.png" style="width: 450px">
+<img src="/images/decision_tree_viz/big_dt_decision_regions_splits.png" style="width: 450px">
 </div>
 <h1 id="conclusion">Conclusion</h1>
 <p>Well there you have it. Some code that plots the split lines for an scikit-learn decision tree. Along the way we took a look at some scikit-learn source code, got to play around with recursion, and practice our top-down problem solving. I don’t know what more I could ask for.</p>
@@ -239,10 +242,10 @@
         </main>
 
         <footer>
-            <a href="https://github.com/ultramann/"><img alt src="../../images/base/github.png" width="3%"></a>
-            <a href="mailto:cary.goltermann@gmail.com"><img alt="email" src="../../images/base/email.png" width="3%"></a>
-            <a href="https://linkedin.com/in/carygoltermann/"><img alt="linkedin" src="../../images/base/linkedin.png" width="3%"></a>
-            <a href="https://twitter.com/CaryGoltermann?lang=en"><img alt="twitter" src="../../images/base/twitter.png" width="3%"></a>
+            <a href="https://github.com/ultramann/"><img alt="" src="/images/base/github.png" width="3%"></a>
+            <a href="mailto:cary.goltermann@gmail.com"><img alt="email" src="/images/base/email.png" width="3%"></a>
+            <a href="https://linkedin.com/in/carygoltermann/"><img alt="linkedin" src="/images/base/linkedin.png" width="3%"></a>
+            <a href="https://twitter.com/CaryGoltermann?lang=en"><img alt="twitter" src="/images/base/twitter.png" width="3%"></a>
             <div>
                 <a href="https://github.com/Ultramann/ultramann.github.io">Source</a> proudly generated by
                 <a href="http://jaspervdj.be/hakyll">Hakyll</a>

@@ -5,9 +5,12 @@
         <meta charset="utf-8">
         <meta http-equiv="x-ua-compatible" content="ie=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Past Posts</title>
+        <title>Posts</title>
         <link rel="stylesheet" href="../css/default.css" />
         <link rel="stylesheet" href="../css/syntax.css" />
+
+        <script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+        <script src="../js/ultramann.js"></script>
     </head>
     <body>
         <header>
@@ -23,20 +26,36 @@
         </header>
 
         <main role="main">
-            <h1 class="title">Past Posts</h1>
-            Here you can find all my previous posts:
-<ul>
+            <h1 class="title">Posts</h1>
+            <table id="posts" style="table-layout: fixed; border-collapse: collapse;">
+    <colgroup>
+        <col style="width:35%">
+        <col style="width:15%">
+        <col style="width:50%">
+    </colgroup>
+    <tr>
+        <th>Title</th>
+        <th>Date</th>
+        <th>Preview</th>
+    </tr>
     
-        <li>
-            <a href="../posts/visualizing_sklearn_decision_trees/">Visualizing scikit-learn Decision Trees</a> - August 12, 2017
-        </li>
+    <tr class="teasable">
+        <td><a href="../posts/visualizing_sklearn_decision_trees/">Visualizing scikit-learn Decision Trees</a></td>
+        <td>Aug 12, 2017</td>
+        <td> <span class="hidable"><p>Decision trees aren’t an insanely difficult concept to grasp. But this doesn’t mean a good visualization of a trained decision tree can’t help develop a deeper understanding of the model.</p>
+<p>In this post we’ll take a look at small piece of code I wrote to draw the split lines that result from a scikit-learn decision tree being built and step through the process I went through to write it. All the code used for the visualizations in this post can be found <a href="https://github.com/Ultramann/ultramann.github.io/blob/source/content/code/visualizing_sklearn_decision_trees/decision_tree_viz.py">here</a>.</p>
+</span></td>
+    </tr>
     
-        <li>
-            <a href="../posts/numeric_python_intro/">Numeric Python - Intro to Broadcasting</a> - July 21, 2017
-        </li>
+    <tr class="teasable">
+        <td><a href="../posts/numeric_python_intro/">Numeric Python - Intro to Broadcasting</a></td>
+        <td>Jul 21, 2017</td>
+        <td> <span class="hidable"><p>This post is a tutorial style introduction to discovering numeric performance optimizations in the Python programming language. It assumes only a cursory knowledge of Python and a tolerance for pinches of math.</p>
+<p>The source code for everything in this tutorial can be found <a href="https://github.com/Ultramann/Numeric-Python-Intro">here</a>. The code in the repository linked above depend on: <code>scipy</code>, <code>numpy</code>, and <code>matplotlib</code>.</p>
+</span></td>
+    </tr>
     
-</ul>
-
+</table>
 
         </main>
 
