@@ -1,3 +1,6 @@
+import matplotlib
+matplotlib.use('Agg')
+
 from time import time
 import kmeans
 import matplotlib.pyplot as plt
@@ -5,6 +8,8 @@ import numpy as np
 
 
 SAVE_PATH = '../images/numeric_python_intro/{}.png'
+SAVE_SETTINGS = dict(bbox_inches='tight', pad_inches=-1, transparent=True)
+SUPPLOT_DIST = 0.9
 
 
 def make_blobs(n_points):
@@ -78,6 +83,9 @@ def plot_single(X, km, title, file_name, legend=False):
     plot_setup(centroids, assignments, ax, legend=legend)
     fig.suptitle(title, fontsize=25)
     remove_ticks(ax)
+
+    fig.tight_layout()
+    plt.subplots_adjust(top=SUPPLOT_DIST)
     plt.savefig(SAVE_PATH.format(file_name), transparent=True)
 
 
@@ -102,6 +110,9 @@ def plot_cluster_comp(X, file_name):
         plot_setup(centroids, assignments, ax, timed_title)
         remove_ticks(ax)
     fig.suptitle('Timing - {} Data Points'.format(X.shape[0]), fontsize=25)
+
+    fig.tight_layout()
+    plt.subplots_adjust(top=SUPPLOT_DIST)
     plt.savefig(SAVE_PATH.format(file_name), transparent=True)
 
 
@@ -131,6 +142,9 @@ def plot_timing_comp(file_name, data_sizes=(10, 100, 1000, 2500, 5000)):
     leg = ax.legend(loc='best', fontsize=15)
     leg.get_frame().set_alpha(0)
     fig.suptitle('Time Scaling for 1000 Iterations', fontsize=25)
+
+    fig.tight_layout()
+    plt.subplots_adjust(top=SUPPLOT_DIST)
     plt.savefig(SAVE_PATH.format(file_name), transparent=True)
 
 

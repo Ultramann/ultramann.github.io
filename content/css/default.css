@@ -36,6 +36,7 @@ footer {
     color: #555;
     font-size: 12px;
     margin-top: 30px;
+    margin-bottom: 25px;
     padding: 12px 0px 12px 10px;
 }
 
@@ -65,6 +66,10 @@ h2 {
     font-size: 20px;
 }
 
+li{
+    margin-top: 12px;
+}
+
 main a {
     color: #0e85ff;
 }
@@ -80,7 +85,17 @@ div.home {
 }
 
 div.mpl {
-    margin-top: 40px;
+    width: 100%;
+    margin-top: 20px;
+    text-align: center;
+}
+
+div.mpl img.single {
+    width: 45%
+}
+
+div.mpl img.double {
+    width: 90%
 }
 
 .logo a {
@@ -88,17 +103,17 @@ div.mpl {
     height: 12px;
 }
 
-#posts {
+#bytes {
     border-collapse: collapse;
     width: 100%;
     }
 
-#posts td, #posts th {
+#bytes td, #bytes th {
     border: 1px solid #012f70;
     padding: 8px;
 }
 
-#posts th {
+#bytes th {
     padding-top: 12px;
     padding-bottom: 12px;
     text-align: left;
@@ -109,11 +124,3 @@ div.mpl {
 .hidable {
     display: none;
 }
-
-/*
-tr.teasable td:last-child {
-    overflow: hidden;
-    white-space: nowrap;
-    opacity: 0.0;
-}
-*/
