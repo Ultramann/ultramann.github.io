@@ -40,13 +40,13 @@
 <p>However, after thinking about what I’d like from the code at a larger scale I realized it would be better to write something for scikit-learn’s decision trees as they are the basis of all scikit-learn’s tree ensemble models. Aka, I would be able to visualize the trees in a random forest or gradient boosted tree ensemble easily if I had something that worked on a single decision tree. Thanks, scikit-learn, for writing well composed code!</p>
 <h1 id="starting-point">Starting Point</h1>
 <p>One thing that’s actually pretty easy to do with classification models is plot their decision regions; note, I’ll only be working with classifiers because of this quality. Let’s take a look at what you get with some sample data, and roughly the strategy used in a scikit-learn tutorial found <a href="http://scikit-learn.org/stable/auto_examples/tree/plot_iris.html">here</a>. The function to generate the plot below, <code>plot_decision_regions</code>, for plotting the decision regions can be found in the source linked above. Note that we really can’t do a great job plotting decision boundaries in greater than two dimensions. So this post will only be looking at data in two dimensions.</p>
-<div class="mpl" style="text-align: center">
-<img src="/images/decision_tree_viz/dt_decision_regions.png" style="width: 450px">
+<div class="mpl">
+<img class="single" src="/images/decision_tree_viz/dt_decision_regions.png">
 </div>
 <p><code>plot_decision_regions</code> works by creating a grid of points (using <a href="https://docs.scipy.org/doc/numpy/reference/generated/numpy.meshgrid.html"><code>np.meshgrid</code></a>), lots of points, and running each of those points through the fitted decision tree to get a prediction. Then all of those predictions are plotted (using <a href="https://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.contourf"><code>plt.contourf</code></a>) creating the illusion that a complete decision regions are known.</p>
 <p>From the decision regions above you could pretty easily infer the splits that were made in the decision tree. I mean, there were only three splits. But consider what happens when the data and therefore the decision tree gets bigger.</p>
-<div class="mpl" style="text-align: center">
-<img src="/images/decision_tree_viz/big_dt_decision_regions.png" style="width: 450px">
+<div class="mpl">
+<img class="single" src="/images/decision_tree_viz/big_dt_decision_regions.png">
 </div>
 <p>To be quite honest, it’d be fair to say that having the explicit split lines plotted on the image above wouldn’t really make it “easier” to understand what splits were made, much less why. But, I definitely don’t think they hurt. Either way, you’ll be able to decide for yourself soon.</p>
 <h1 id="decision-trees-in-scikit-learn">Decision Trees in scikit-learn</h1>
@@ -84,8 +84,8 @@
 <h1 id="drawing-the-split-lines">Drawing the Split Lines</h1>
 <p>One of the first things that I was thinking prior to all this digging into scikit-learn source was that I’d be writing the code to tear apart the tree recursively. In line with the discussion of the tree building process above, this doesn’t directly match with either the most pythonic approach to the problem, nor iterative process used to build the tree. On this note I’m punting since recursion, while not particularly pythonic, is cool and definitely faster for my brain and fingers to code up. The only potential downfall to choosing the recursion path is that Python enforces a default recursion depth limit of somewhere around 1000. So I could potentially run into that if I tried to recursively break down a scikit-learn tree that is <em>HUGE</em>. Good to know the limitations upfront and I’m willing to accept those potential future consequences. Moving on.</p>
 <p>For a reference to aim for, this is what we’re trying to create.</p>
-<div class="mpl" style="text-align: center">
-<img src="/images/decision_tree_viz/dt_decision_regions_splits.png" style="width: 450px">
+<div class="mpl">
+<img class="single" src="/images/decision_tree_viz/dt_decision_regions_splits.png">
 </div>
 <h2 id="strategy">Strategy</h2>
 <p>Since I’ve already decided that I’m going to use a recursive approach to traverse down the tree I’m positioned quite well to take a <a href="https://en.wikipedia.org/wiki/Top-down_and_bottom-up_design">top-down</a> strategy to implementing this function. Top-down programming is going to be really effective here because I already know what the structure of a recursive function looks like. And even though I don’t know the parameters that this function should be taking yet, nor what it should be returning, if anything, the top-down process will help me discover these things naturally.</p>
@@ -201,8 +201,8 @@
         <span class="cf">else</span>:
             ax.plot((threshold, threshold), y_bounds, <span class="st">&#39;k-&#39;</span>, lw<span class="op">=</span><span class="fl">0.5</span>)</code></pre></div>
 <p>This function is super simple, it makes an empty list that will hold all the features, thresholds and bounds. Then it makes the first call to <code>get_split_lines</code> passing it the empty list it just created, the node id for the root of the tree, <code>0</code>, the boundaries of the <code>Axis</code> it was passed, False for whether or not it’s at a leaf, and all of the arrays holding the split information from the <code>Tree</code>. Then is simply iterates over the list that gets mutated in place during all the recursive calls, and depending on what feature was selected it plots a line on the appropriate axis. Let’s see what it produces.</p>
-<div class="mpl" style="text-align: center">
-<img src="/images/decision_tree_viz/dt_decision_regions_splits_close.png" style="width: 450px">
+<div class="mpl">
+<img class="single" src="/images/decision_tree_viz/dt_decision_regions_splits_close.png">
 </div>
 <p>This is pretty close! But, what’s with the line over on the left side??</p>
 <p>It took me a couple of minutes to figure this out. But eventually I realized that scikit-learn must be “choosing” a split sometime to catch all of the points. No matter. I just added a conditional to make sure that the function only recurses if the split is within the boundaries of the feature that was chosen. And so, the final version of the function!</p>
@@ -231,8 +231,8 @@
     get_split_lines(ftbs, right_child, right_bounds, right_child <span class="op">==</span> node_id,
                        features, thresholds, children_left, children_right)</code></pre></div>
 <p>And here’s what it creates on the same large tree from above. Nice.</p>
-<div class="mpl" style="text-align: center">
-<img src="/images/decision_tree_viz/big_dt_decision_regions_splits.png" style="width: 450px">
+<div class="mpl">
+<img class="single" src="/images/decision_tree_viz/big_dt_decision_regions_splits.png">
 </div>
 <h1 id="conclusion">Conclusion</h1>
 <p>Well there you have it. Some code that plots the split lines for an scikit-learn decision tree. Along the way we took a look at some scikit-learn source code, got to play around with recursion, and practice our top-down problem solving. I don’t know what more I could ask for.</p>
