@@ -19,13 +19,13 @@ However, after thinking about what I'd like from the code at a larger scale I re
 
 One thing that's actually pretty easy to do with classification models is plot their decision regions; note, I'll only be working with classifiers because of this quality. Let's take a look at what you get with some sample data, and roughly the strategy used in a scikit-learn tutorial found [here](http://scikit-learn.org/stable/auto_examples/tree/plot_iris.html). The function to generate the plot below, `plot_decision_regions`, for plotting the decision regions can be found in the source linked above. Note that we really can't do a great job plotting decision boundaries in greater than two dimensions. So this post will only be looking at data in two dimensions.
 
-<div class="mpl"><img class="single" src="/images/decision_tree_viz/dt_decision_regions.png"></div>
+<div class="mpl"><img class="single" src="/images/visualizing_sklearn_decision_trees/dt_decision_regions.png"></div>
 
 `plot_decision_regions` works by creating a grid of points (using [`np.meshgrid`](https://docs.scipy.org/doc/numpy/reference/generated/numpy.meshgrid.html)), lots of points, and running each of those points through the fitted decision tree to get a prediction. Then all of those predictions are plotted (using [`plt.contourf`](https://matplotlib.org/api/pyplot_api.html#matplotlib.pyplot.contourf)) creating the illusion that a complete decision regions are known.
 
 From the decision regions above you could pretty easily infer the splits that were made in the decision tree. I mean, there were only three splits. But consider what happens when the data and therefore the decision tree gets bigger.
 
-<div class="mpl"><img class="single" src="/images/decision_tree_viz/big_dt_decision_regions.png"></div>
+<div class="mpl"><img class="single" src="/images/visualizing_sklearn_decision_trees/big_dt_decision_regions.png"></div>
 
 To be quite honest, it'd be fair to say that having the explicit split lines plotted on the image above wouldn't really make it "easier" to understand what splits were made, much less why. But, I definitely don't think they hurt. Either way, you'll be able to decide for yourself soon.
 
@@ -106,7 +106,7 @@ One of the first things that I was thinking prior to all this digging into sciki
 
 For a reference to aim for, this is what we're trying to create.
 
-<div class="mpl"><img class="single" src="/images/decision_tree_viz/dt_decision_regions_splits.png"></div>
+<div class="mpl"><img class="single" src="/images/visualizing_sklearn_decision_trees/dt_decision_regions_splits.png"></div>
 
 ## Strategy
 
@@ -267,7 +267,7 @@ def plot_split_lines(tree, ax):
 
 This function is super simple, it makes an empty list that will hold all the features, thresholds and bounds. Then it makes the first call to `get_split_lines` passing it the empty list it just created, the node id for the root of the tree, `0`, the boundaries of the `Axis` it was passed, False for whether or not it's at a leaf, and all of the arrays holding the split information from the `Tree`. Then is simply iterates over the list that gets mutated in place during all the recursive calls, and depending on what feature was selected it plots a line on the appropriate axis. Let's see what it produces.
 
-<div class="mpl"><img class="single" src="/images/decision_tree_viz/dt_decision_regions_splits_close.png"></div>
+<div class="mpl"><img class="single" src="/images/visualizing_sklearn_decision_trees/dt_decision_regions_splits_close.png"></div>
 
 This is pretty close! But, what's with the line over on the left side??
 
@@ -302,7 +302,7 @@ def get_split_lines(ftbs, node_id, bounds, leaf,
 
 And here's what it creates on the same large tree from above. Nice.
 
-<div class="mpl"><img class="single" src="/images/decision_tree_viz/big_dt_decision_regions_splits.png"></div>
+<div class="mpl"><img class="single" src="/images/visualizing_sklearn_decision_trees/big_dt_decision_regions_splits.png"></div>
 
 # Conclusion
 

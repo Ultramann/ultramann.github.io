@@ -52,7 +52,7 @@ def plot_2d_2class(X, y, ax, incorrect_label=None):
     y : ndarray, 1D labels
     ax : matplotlib Axis object
     incorrect_label : ndarray, 1D bools - point labeled incorrect or not
-    """ 
+    """
     for i, color in zip((0, 1), 'br'):
         X_class = X[y == i]
         if incorrect_label is None:
@@ -83,7 +83,7 @@ def plot_decision_regions(classifier, ax, prob_gradient=False, h=.005):
         Z = classifier.predict_proba(np.c_[xx.ravel(), yy.ravel()])[:, 0].flatten()
     else:
         cmap = plt.cm.seismic
-        Z = classifier.predict(np.c_[xx.ravel(), yy.ravel()]) 
+        Z = classifier.predict(np.c_[xx.ravel(), yy.ravel()])
 
     Z = Z.reshape(xx.shape)
 
@@ -98,7 +98,7 @@ def get_split_lines(ftbs, node_id, bounds, leaf,
     Parameters
     ----------
     ftbs : list, tuples of feature, threshold, bounds for one of the splits in
-                 the tree 
+                 the tree
     node_id : int, id of the node's whose decision boundary to plot this step
     bounds : ((float, float), (float, float)), ((x_min, x_max), (y_min, y_max))
                                                bounds of the region that the node
@@ -119,7 +119,7 @@ def get_split_lines(ftbs, node_id, bounds, leaf,
     x_bounds, y_bounds = bounds
     feature, threshold = features[node_id], thresholds[node_id]
     left_child, right_child = children_left[node_id], children_right[node_id]
-     
+
     feature_bounds = bounds[feature]
     if feature_bounds[0] <= threshold <= feature_bounds[1]:
         ftbs.append((feature, threshold, bounds))
@@ -138,7 +138,32 @@ def get_split_lines(ftbs, node_id, bounds, leaf,
                        features, thresholds, children_left, children_right)
 
 
-def plot_split_lines(tree, ax):
+def get_split_lines_close(ftbs, node_id, bounds, leaf,
+                          features, thresholds, children_left, children_right):
+    """Same as get_split_lines but plots lines out of bounds. Included for
+    producting plot for blog.
+    """
+    if leaf: return
+
+    x_bounds, y_bounds = bounds
+    feature, threshold = features[node_id], thresholds[node_id]
+    left_child, right_child = children_left[node_id], children_right[node_id]
+
+    ftbs.append((feature, threshold, bounds))
+    if feature == 1:
+        left_bounds = (x_bounds, (y_bounds[0], threshold))
+        right_bounds = (x_bounds, (threshold, y_bounds[1]))
+    else:
+        left_bounds = ((x_bounds[0], threshold), y_bounds)
+        right_bounds = ((threshold, x_bounds[1]), y_bounds)
+
+    get_split_lines_close(ftbs, left_child, left_bounds, left_child == node_id,
+                          features, thresholds, children_left, children_right)
+    get_split_lines_close(ftbs, right_child, right_bounds, right_child == node_id,
+                          features, thresholds, children_left, children_right)
+
+
+def plot_split_lines(tree, ax, close=False):
     """Plots the split boundaries within the regions of a tree object.
     Starts the recursive call to plot_boundary_lines passing node id 0,
     aka, initializing with root node.
@@ -147,12 +172,14 @@ def plot_split_lines(tree, ax):
     ----------
     tree : sklearn Tree object, attribute of trained DecisionTree object
     ax : matplotlib Axis object
+    close : bool, plot the split lines with the close algorithm?
     """
     feats_threshs_bounds = []
-    get_split_lines(feats_threshs_bounds, 0,
-                    (ax.get_xlim(), ax.get_ylim()),
-                    False, tree.feature, tree.threshold,
-                    tree.children_left, tree.children_right)
+    split_line_getter = get_split_lines_close if close else get_split_lines
+    split_line_getter(feats_threshs_bounds, 0,
+                      (ax.get_xlim(), ax.get_ylim()),
+                      False, tree.feature, tree.threshold,
+                      tree.children_left, tree.children_right)
     for feature, threshold, (x_bounds, y_bounds) in feats_threshs_bounds:
         if feature == 1:
             ax.plot(x_bounds, (threshold, threshold), 'k-', lw=0.5)
