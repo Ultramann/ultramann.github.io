@@ -1,0 +1,26 @@
+<div class="col-container">
+    <div style="float:left; display:table; width:55%">
+        <table id="bytes">
+            <colgroup>
+                <col style="width:75%">
+                <col style="width:25%">
+                <col style="width:0%">
+            </colgroup>
+            <tr>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+            $for(bytes)$
+            <tr class="floating-teasable">
+                <td><b><a href="$url$">$title$</a></b></td>
+                <td>$date$ </td>
+                <td><span class=hidable>$teaser$</span></td>
+            </tr>
+            $endfor$
+        </table>
+    </div>
+    <div class="top" style="float:right; width:10%"></div>
+    <div class="preview" style="float:right; display:table; text-display:justify; width:42%"></div>
+    <div class="bottom" style="float:right; width:10%"></div>
+</div>

@@ -1,19 +1,21 @@
-<table id="bytes" style="table-layout: fixed; border-collapse: collapse;">
+<p>Personal notes on things that I've been learning about. Date updated when notes changed.</p>
+
+<table id="bytes">
     <colgroup>
         <col style="width:38%">
         <col style="width:15%">
         <col style="width:47%">
     </colgroup>
     <tr>
-        <th>Title</th>
-        <th>Date</th>
-        <th>Preview</th>
+        <th></th>
+        <th></th>
+        <th></th>
     </tr>
     $for(bytes)$
-    <tr class="teasable">
+    <tr class="table-teasable">
         <td><b><a href="$url$">$title$</a></b></td>
         <td>$date$</td>
-        <td> <span class=hidable>$teaser$</span></td>
+        <td><span class=hidable>$teaser$</span></td>
     </tr>
     $endfor$
 </table>

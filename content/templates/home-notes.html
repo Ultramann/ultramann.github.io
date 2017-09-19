@@ -1,10 +1,10 @@
 <div class="home">
-<table id="bytes" style="table-layout: fixed; border-collapse: collapse;">
-$for(notes)$
-    <tr class="teasable">
-        <td><b><a href="$url$">$title$</a></b></td>
-        <td> <span class=hidable>$teaser$</span></td>
-    </tr>
-$endfor$
-</table>
+    <table id="bytes">
+        $for(notes)$
+        <tr class="table-teasable">
+            <td><b><a href="$url$">$title$</a></b></td>
+            <td><span class=hidable>$teaser$</span></td>
+        </tr>
+        $endfor$
+    </table>
 </div>

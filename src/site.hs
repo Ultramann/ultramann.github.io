@@ -48,7 +48,7 @@ main = do
                       <> defaultContext
 
         makeItem ""
-          >>= loadAndApplyTemplate "templates/bytes.html" archiveCtx
+          >>= loadAndApplyTemplate "templates/posts.html" archiveCtx
           >>= loadAndApplyTemplate "templates/base.html"  archiveCtx
           >>= relativizeUrls
           >>= cleanIndexUrls
@@ -62,7 +62,7 @@ main = do
                       <> defaultContext
 
         makeItem ""
-          >>= loadAndApplyTemplate "templates/bytes.html" archiveCtx
+          >>= loadAndApplyTemplate "templates/notes.html" archiveCtx
           >>= loadAndApplyTemplate "templates/base.html"  archiveCtx
           >>= relativizeUrls
           >>= cleanIndexUrls
