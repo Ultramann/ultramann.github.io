@@ -5,7 +5,7 @@
         <meta charset="utf-8">
         <meta http-equiv="x-ua-compatible" content="ie=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Bash</title>
+        <title>Neural Networks in Haskell</title>
         <link rel="stylesheet" href="/css/default.css" />
         <link rel="stylesheet" href="/css/syntax.css" />
 
@@ -26,43 +26,15 @@
         </header>
 
         <main role="main">
-            <h1 class="title">Bash</h1>
+            <h1 class="title">Neural Networks in Haskell</h1>
             <article>
     <section class="header">
-        <i>Posted on Jul 28, 2017</i>
+        <i>Posted on Sep 20, 2017</i>
     </section>
     <section>
-        <p>Notes on the <a href="https://en.wikipedia.org/wiki/Bash_(Unix_shell)">bourne again shell</a>. Has both small programs and scripting.</p>
+        <p>I’ve been playing with Haskell as a hobby language for about a year and half and finally got to the point with the langauge where I wanted to build a side project, both to learn more about Haskell and to build something.</p>
+<p>This post is about building a simple API for building and training feedforward neural networks in Haskell.</p>
 <!--more-->
-<h1 id="bash-notes">Bash Notes</h1>
-<h2 id="looping">Looping</h2>
-<h3 id="for-loop">For Loop</h3>
-<ul>
-<li>Match directly on glob: <code>for fd in *; do echo $fd; done</code></li>
-<li>Iterate over output of command: <code>for fd in $(ls); do echo $fd; done</code></li>
-</ul>
-<h2 id="awesome-programs">Awesome Programs</h2>
-<h3 id="xargs">xargs</h3>
-<ul>
-<li><code>ls | grep .py$ | xargs wc -l</code>: counts the number of lines of each <code>.py</code> file in the directory and sums them up.</li>
-</ul>
-<h3 id="grep">grep</h3>
-<ul>
-<li><code>grep -v</code>: inverse selection</li>
-</ul>
-<h2 id="examples">Examples</h2>
-<p>Counting lines by last word occurrence without lines that have a quote.</p>
-<pre><code>cat data.csv | grep -v \&quot; | grep COKE | cut -f 4 -d &#39;,&#39; | sort | uniq -c</code></pre>
-<p>Data</p>
-<blockquote>
-<blockquote>
-<pre><code>CTIERRY COKE,3.38,89.61,beverages
-COKE,1.56,14.98,beverages
-COKE,1.55,46.97,beverages
-DIET COKE 2002,2.54,6.3,beverages
-COKE,4.52,76.36,beverages</code></pre>
-</blockquote>
-</blockquote>
     </section>
 </article>
 
