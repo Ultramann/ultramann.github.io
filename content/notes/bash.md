@@ -26,6 +26,20 @@ Notes on the [bourne again shell](https://en.wikipedia.org/wiki/Bash_(Unix_shell
 
 * `grep -v`: inverse selection
 
+### find
+
+Searches for files in a directory hierarchy.
+
+#### Useful Flags
+
+* `-name <pattern>`
+* `-type {(f)ile, (d)irectory}`
+
+#### Examples
+
+* `find . -name *.py`
+* `find . -t d -name notes`
+
 ## Examples
 
 Counting lines by last word occurrence without lines that have a quote.
