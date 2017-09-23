@@ -19,7 +19,7 @@ What is taking up all of this memory? You ask. It's a combination of basically a
 
 With this information it now makes sense to use BasicTeX instead of the entirety of MacTeX. BasicTeX has a **much** smaller memory footprint than MacTeX. The downside of BasicTeX is that it doesn't ship with all of the necessary packages that I use to make great PDFs.
 
-It turns out, though, that BasicTeX does ship with a command line package installer. So I wrote a [script](ihttps://github.com/Ultramann/ultramann.github.io/blob/source/content/code/smaller_mac_latex/setup.sh) to install the packages I require beyond what comes with BasicTeX. This is great because it's likely the list of packages the script currently installs will likely need to be expanded, but since this is controlled programmatically it's easy to update for future installs.
+It turns out, though, that BasicTeX does ship with a command line package installer. So I wrote a [script](https://github.com/Ultramann/ultramann.github.io/blob/source/content/code/smaller_mac_latex/setup.sh) to install the packages I require beyond what comes with BasicTeX. This is great because it's likely the list of packages the script currently installs will likely need to be expanded, but since this is controlled programmatically it's easy to update for future installs.
 
 To get set up with LaTeX in this way you can follow the instructions below.
 
