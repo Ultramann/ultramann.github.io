@@ -50,7 +50,19 @@
 <ul>
 <li><code>grep -v</code>: inverse selection</li>
 </ul>
-<h2 id="examples">Examples</h2>
+<h3 id="find">find</h3>
+<p>Searches for files in a directory hierarchy.</p>
+<h4 id="useful-flags">Useful Flags</h4>
+<ul>
+<li><code>-name &lt;pattern&gt;</code></li>
+<li><code>-type {(f)ile, (d)irectory}</code></li>
+</ul>
+<h4 id="examples">Examples</h4>
+<ul>
+<li><code>find . -name *.py</code></li>
+<li><code>find . -t d -name notes</code></li>
+</ul>
+<h2 id="examples-1">Examples</h2>
 <p>Counting lines by last word occurrence without lines that have a quote.</p>
 <pre><code>cat data.csv | grep -v \&quot; | grep COKE | cut -f 4 -d &#39;,&#39; | sort | uniq -c</code></pre>
 <p>Data</p>

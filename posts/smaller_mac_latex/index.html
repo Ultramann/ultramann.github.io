@@ -29,42 +29,37 @@
             <h1 class="title">Smaller LaTeX for Mac</h1>
             <article>
     <section class="header">
-        <i>Posted on Sep 19, 2017</i>
+        <i>Posted on Sep 23, 2017</i>
     </section>
     <section>
-        <p>Instructions for having a version of latex with a smaller memory footprint.</p>
+        <p>Instructions for setting up a version of LaTeX on a Mac with a smaller memory footprint than out of the box MacTeX.</p>
+<p>I mainly use LaTeX to produce high quality PDFs and PDF-based slide decks, and this set up works great for all my needs.</p>
 <!--more-->
 <h1 id="smaller-latex-for-mac">Smaller LaTeX for Mac</h1>
-<h2 id="table-of-contents">Table of Contents</h2>
-<ol style="list-style-type: decimal">
-<li><a href="#purpose">Purpose</a></li>
-<li><a href="#setup-instructions">Setup Instructions</a>
-<ol style="list-style-type: decimal">
-<li><a href="#uninstalling-old-latex-version">Uninstalling Old MacTex</a></li>
-<li><a href="#installing-basictex">Installing BasicTex</a></li>
-</ol></li>
-<li><a href="#using-latex">Using LaTeX</a></li>
-</ol>
 <h2 id="purpose">Purpose</h2>
-<p>Using LaTeX on a Mac is somewhat simple, you download <a href="http://www.tug.org/mactex/">MacTeX</a>. Sometimes ths download doesn’t work, they give you the checksum to verify though. But once you’ve downloaded the installer running it to MacTeX is simple…and takes ~5 GB of disk space.</p>
-<p>This issues is addressed by installing BasicTex instead of the full MacTex packages. BasicTex has a <strong>much</strong> smaller memory footprint. The downside of BasicTex is that it doesn’t ship with all of the necessary packages for developing great slides. The <code>setup.sh</code> script solves this problem by installing the requisite packages. (Note: the list of packages that it currently installs will likely need to be expanded, if you find a package that you think is worth installing feel free to add the package to the list in the setup script and submit a pull request to update.)</p>
+<p>Using LaTeX on a Mac is somewhat simple, you download <a href="http://www.tug.org/mactex/">MacTeX</a>. Sometimes this download doesn’t work, they give you the checksum to verify though. But once you’ve downloaded the installer running it to install MacTeX is simple…and takes ~5 GB of disk space.</p>
+<p>What is taking up all of this memory? You ask. It’s a combination of basically any LaTeX package you could ever want along with a ton of GUIs. Luckily I don’t use GUIs and I have a pretty short list of packages I want installed.</p>
+<p>With this information it now makes sense to use BasicTeX instead of the entirety of MacTeX. BasicTeX has a <strong>much</strong> smaller memory footprint than MacTeX. The downside of BasicTeX is that it doesn’t ship with all of the necessary packages that I use to make great PDFs.</p>
+<p>It turns out, though, that BasicTeX does ship with a command line package installer. So I wrote a <a href="https://github.com/Ultramann/ultramann.github.io/blob/source/content/code/smaller_mac_latex/setup.sh">script</a> to install the packages I require beyond what comes with BasicTeX. This is great because it’s likely the list of packages the script currently installs will likely need to be expanded, but since this is controlled programmatically it’s easy to update for future installs.</p>
+<p>To get set up with LaTeX in this way you can follow the instructions below.</p>
 <h2 id="setup-instructions">Setup Instructions</h2>
 <h3 id="uninstalling-old-latex-version">Uninstalling Old LaTeX Version</h3>
-<p>If you happen to already have MacTex installed and want to free up some disk space simply delete the following directories:</p>
+<p>If you happen to already have MacTeX installed and want to free up some disk space simply delete the following directories:</p>
 <ul>
 <li><code>/usr/local/texlive</code></li>
 <li><code>/Library/TeX</code></li>
 </ul>
-<h3 id="installing-basictex">Installing BasicTex</h3>
+<h3 id="installing-basictex">Installing BasicTeX</h3>
 <ol style="list-style-type: decimal">
-<li>Download BasicTex by clicking <a href="http://tug.org/cgi-bin/mactex-download/BasicTeX.pkg">here</a>.</li>
-<li>Go through the install procedure by opening the BasicTex <code>.pkg</code> that you just downloaded. All of the defaults are fine.</li>
-<li>Run the setup script: <code>bash setup.sh</code>.</li>
+<li>Download BasicTeX by clicking <a href="http://tug.org/cgi-bin/mactex-download/BasicTeX.pkg">here</a>.</li>
+<li>Go through the install procedure by opening the BasicTeX <code>.pkg</code> that you just downloaded. All of the defaults are fine.</li>
+<li>Run the setup <a href="https://github.com/Ultramann/ultramann.github.io/blob/source/content/code/smaller_mac_latex/setup.sh">script</a>: <code>bash setup.sh</code>.</li>
 </ol>
 <h2 id="using-latex">Using LaTeX</h2>
-<p>Using LaTeX is just like using any other markup language. If you want to figure out how to typeset something in LaTeX, google is your friend, there is a huge Stack Overflow presence of LaTeX questions getting answered. For slides we use the <a href="https://www.sharelatex.com/learn/Beamer">beamer</a> package.</p>
-<p>As these instructions are for building a bare bones LaTeX environment there is no GUI as you might be used to working with to edit LaTeX. Instead you can simply use your text editor of choice to write a <code>.tex</code> document. To compile the file you run <code>pdflatex &lt;file_name&gt;.tex</code>.</p>
-<p>One thing that you might miss is having a dynamically reloading view of the PDF that is generated, this unfortunately is something that Preview does poorly, it will reload the view of the PDF when you regenerate it, but it always returns you to the top of the document. Fortunately there is an open source PDF reader called Skim that auto-reloads PDFs when they get regenerated and returns you to the current location. You can download it <a href="https://sourceforge.net/projects/skim-app/files/Skim/Skim-1.4.29/Skim-1.4.29.dmg/download">here</a>. To make it easy to open PDFs from the command line with Skim you can add the following lines to bash profile. They will allow you to run <code>opentex &lt;file_name&gt;.pdf</code> from the command line to open a PDF with Skim.</p>
+<p>Using LaTeX is just like using any other markup language. If you want to figure out how to typeset something in LaTeX, google is your friend, there is a huge Stack Overflow presence of LaTeX questions getting answered. For slides I use the <a href="https://www.sharelatex.com/learn/Beamer">beamer</a> package.</p>
+<p>As these instructions are for building a bare bones LaTeX environment there is no GUI as you might be used to working with to edit LaTeX. Instead you can simply use your text editor of choice to write a <code>.tex</code> document. To compile the file you run <code>pdflatex -shell-escape &lt;file_name&gt;.tex</code> at the command line. As I use Vim as my text editor, I have a key binding to run this command on the file currently being edited to simplify this process.</p>
+<p>One thing that you might miss is having a dynamically reloading view of the PDF that is generated, this unfortunately is something that Preview does poorly, it will reload the view of the PDF when you regenerate it, but it always returns you to the top of the document.</p>
+<p>Fortunately there is an open source PDF reader called Skim that auto-reloads PDFs when they get regenerated and returns you to the current location. You can download it <a href="https://sourceforge.net/projects/skim-app/files/Skim/Skim-1.4.29/Skim-1.4.29.dmg/download">here</a>. To make it easy to open PDFs from the command line with Skim you can add the following lines to your bash profile. They will allow you to run <code>opentex &lt;file_name&gt;.pdf</code> from the command line to open a PDF with Skim.</p>
 <blockquote>
 <blockquote>
 <pre><code>openTex() {
@@ -73,6 +68,8 @@
 alias opentex=openTex</code></pre>
 </blockquote>
 </blockquote>
+<h2 id="wrap-up">Wrap Up</h2>
+<p>That’s about it. With this set up I can easily write LaTeX in my preferred text editor, from my terminal, and still get good preview functionality all the while keeping LaTeX’s memory footprint to ~0.5 GB.</p>
     </section>
 </article>
 
