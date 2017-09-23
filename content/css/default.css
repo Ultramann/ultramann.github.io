@@ -82,10 +82,16 @@ h1.title {
     font-size: 32px;
 }
 
-div.home {
+div.home-post {
     border-radius: 10px;
     background-color: #f4f8ff;
     padding: 15px 30px 15px 30px;
+}
+
+div.home-notes {
+    border-radius: 10px;
+    background-color: #f4f8ff;
+    padding: 25px 30px 25px 30px;
 }
 
 div.mpl {
