@@ -1,15 +1,25 @@
 {-# LANGUAGE OverloadedStrings #-}
 
+import Control.Monad (mapM_, when)
 import Data.Monoid ((<>))
 import Data.List (isSuffixOf)
 import System.Environment (getArgs)
 import System.FilePath (takeBaseName)
 import Hakyll
 
+clean :: IO ()
+clean = mapM_ remove ["site", "cache"]
+  where remove dir = let path = "generated/" ++ dir in do 
+          putStrLn $ "Removing " ++ path ++ "..."
+          removeDirectory path
+
 main :: IO ()
 main = do
-  (arg:_) <- getArgs 
-  let posts = fromGlob $ "posts/" ++ if arg == "watch" then "**" else "*"
+  (arg:_) <- getArgs
+  let notes = "notes/*"
+      devel = arg == "watch"
+      posts = fromGlob $ "posts/" ++ if devel then "**" else "*"
+  when devel clean
 
   hakyllWith siteConf $ do
     match ("images/**" .||. "js/*") $ do
@@ -26,14 +36,14 @@ main = do
             >>= loadAndApplyTemplate "templates/base.html" defaultContext
 
     match posts $ do
-      route $ niceRoute "posts/"
+      route   $ niceRoute "posts/"
       compile $ pandocCompiler
             >>= saveSnapshot "teaser"
             >>= loadAndApplyTemplate "templates/byte.html" byteCtx
             >>= loadAndApplyTemplate "templates/base.html" byteCtx
 
-    match "notes/*" $ do
-      route $ niceRoute "notes/"
+    match notes $ do
+      route   $ niceRoute "notes/"
       compile $ pandocCompiler
             >>= saveSnapshot "teaser"
             >>= loadAndApplyTemplate "templates/byte.html" byteCtx
@@ -42,8 +52,8 @@ main = do
     create ["posts.html"] $ do
       route   $ niceRoute ""
       compile $ do
-        posts <- recentFirst =<< loadAll posts
-        let archiveCtx = listField "bytes" byteCtx (return posts)
+        chronPosts <- recentFirst =<< loadAll posts
+        let archiveCtx = listField "bytes" byteCtx (return chronPosts)
                       <> constField "title" "Posts"
                       <> defaultContext
 
@@ -56,8 +66,8 @@ main = do
     create ["notes.html"] $ do
       route   $ niceRoute ""
       compile $ do
-        notes <- recentFirst =<< loadAll "notes/*"
-        let archiveCtx = listField "bytes" byteCtx (return notes)
+        chronNotes <- recentFirst =<< loadAll notes
+        let archiveCtx = listField "bytes" byteCtx (return chronNotes)
                       <> constField "title" "Notes"
                       <> defaultContext
 
@@ -70,10 +80,10 @@ main = do
     match "index.html" $ do
       route idRoute
       compile $ do
-        posts <- recentFirst =<< loadAll posts
-        notes <- recentFirst =<< loadAll "notes/*"
-        let indexCtx = listField "posts" byteCtx (return (take 1 posts))
-                    <> listField "notes" byteCtx (return (take 6 notes))
+        chronPosts <- recentFirst =<< loadAll posts
+        chronNotes <- recentFirst =<< loadAll notes
+        let indexCtx = listField "posts" byteCtx (return (take 1 chronPosts))
+                    <> listField "notes" byteCtx (return (take 6 chronNotes))
                     <> constField "title" "Mostly Literate Machine Learning"
                     <> defaultContext
 
